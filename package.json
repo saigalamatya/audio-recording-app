@@ -21,8 +21,6 @@
     "@angular/platform-browser-dynamic": "^6.1.0",
     "@angular/router": "^6.1.0",
     "@swimlane/ngx-charts": "^10.1.0",
-    "chart.js": "^2.9.4",
-    "chartjs-plugin-annotation": "^0.5.7",
     "core-js": "^2.5.4",
     "recordrtc": "^5.6.1",
     "rxjs": "~6.2.0",

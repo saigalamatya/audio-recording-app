@@ -14,7 +14,6 @@ export class AppComponent {
   drawVisual;
   audioCtx;
   analyser;
-  rec;
   source;
 
   distortion;
@@ -52,19 +51,7 @@ export class AppComponent {
   ) {
   }
 
-  ngOnInit() {
-    // this.startRecording();
-    // var phasors = fft.fft(this.signal);
-
-    // var frequencies = this.fftUtil.fftFreq(phasors, 8000), // Sample rate and coef is just used for length, and frequency step
-    //   magnitudes = this.fftUtil.fftMag(phasors);
-
-    // var both = frequencies.map(function (f, ix) {
-    //   return { frequency: f, magnitude: magnitudes[ix] };
-    // });
-
-    // console.log(both);
-  }
+  ngOnInit() { }
 
   ngAfterViewInit(): void {
     this.canvasCtx = this.canvas.nativeElement.getContext('2d');
@@ -101,7 +88,7 @@ export class AppComponent {
           this.recordRTC.startRecording();
 
           //start the recording process 
-          console.log("Recording started", this.rec);
+          console.log("Recording started", this.recordRTC);
 
           this.visualize();
         }
@@ -173,64 +160,67 @@ export class AppComponent {
     console.log('Audio: ', au);
     au.play();
 
-    // var wavesurfer = WaveSurfer.create({
-    //   container: document.querySelector('#waveform'),
-    //   barWidth: 2,
-    //   barHeight: 1, // the height of the wave
-    //   barGap: null, // the optional spacing between bars of the wave, if not provided will be calculated in legacy format
-    //   waveColor: 'violet',
-    //   progressColor: 'purple'
-    // });
-    // console.log('Wave surfer: ', wavesurfer);
-    // wavesurfer.loadBlob(blob);
-    // wavesurfer.on('ready', function () {
-    //   wavesurfer.play();
-    // });
-
+    var wavesurfer = WaveSurfer.create({
+      container: document.querySelector('#waveform'),
+      barWidth: 2,
+      barHeight: 1, // the height of the wave
+      barGap: null, // the optional spacing between bars of the wave, if not provided will be calculated in legacy format
+      waveColor: 'violet',
+      progressColor: 'purple'
+    });
+    console.log('Wave surfer: ', wavesurfer);
+    wavesurfer.loadBlob(blob);
+    wavesurfer.on('ready', function () {
+      wavesurfer.play();
+    });
   }
 
   visualize() {
 
+    let WIDTH = this.canvas.nativeElement.width;
+    let HEIGHT = this.canvas.nativeElement.height;
+
     this.analyser.fftSize = 2048;
 
-    var bufferLengthAlt = this.analyser.frequencyBinCount;
-    var dataArrayAlt = new Uint8Array(bufferLengthAlt);
+    var bufferLength = this.analyser.frequencyBinCount;
+    var dataArray = new Uint8Array(bufferLength);
+    let freqDomain = new Float32Array(bufferLength);
     this.canvasCtx.clearRect(0, 0, 500, 100);
 
     var drawAlt = () => {
-      console.log("data array alt: ", dataArrayAlt);
+      console.log("data array: ", dataArray);
 
       console.log('Analyser: ', this.analyser);
 
-      this.audioBufferData.push(Object.assign({ time: this.audioCtx.currentTime, data: dataArrayAlt }));
-      // audioBufferArray = audioBufferArray.concat([...dataArrayAlt]);
-      dataArrayAlt.forEach(x => {
+      this.audioBufferData.push(Object.assign({ time: this.audioCtx.currentTime, data: dataArray }));
+      // audioBufferArray = audioBufferArray.concat([...dataArray]);
+      dataArray.forEach(x => {
         this.audioBufferArray.push(x);
       });
 
-
       console.log('Audio Buffer data: ', this.audioBufferData);
       console.log('Audio Buffer array: ', this.audioBufferArray);
+
+      // getByteFrequencyData() -> copies current frequency data into unassigned byte array passed into it
+      this.analyser.getByteFrequencyData(dataArray);
+      this.analyser.getByteTimeDomainData(dataArray);
 
       this.drawVisual = requestAnimationFrame(drawAlt);
 
       console.log('Draw visual: ', this.drawVisual);
 
-      // getByteFrequencyData() -> copies current frequency data into unassigned byte array passed into it
-      this.analyser.getByteFrequencyData(dataArrayAlt);
-      this.analyser.getByteTimeDomainData(dataArrayAlt);
-      this.canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+      this.canvasCtx.fillStyle = "rgba(0,0,0,0.2)";
       // draws a filled rectangle whose starting point is at (x, y)
       // draws according to current fillStyle(color, gradient, pattern)
-      this.canvasCtx.fillRect(0, 0, 500, 100);
+      this.canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      var barWidth = (500 / bufferLengthAlt) * 2.5;
+      var barWidth = (WIDTH / bufferLength) * 2.5;
       let max_val = -Infinity;
       let max_index = -1;
       var barHeight;
       var x = 0;
-      for (var i = 0; i < bufferLengthAlt; i++) {
-        barHeight = dataArrayAlt[i];
+      for (var i = 0; i < bufferLength; i++) {
+        barHeight = dataArray[i];
         if (barHeight > max_val) {
           max_val = barHeight;
           max_index = i;
@@ -238,13 +228,12 @@ export class AppComponent {
         }
 
         this.canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
-        this.canvasCtx.fillRect(x, 100 - barHeight / 2, barWidth, barHeight / 2);
+        this.canvasCtx.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight / 2);
 
         x += barWidth + 1;
       }
     }
     drawAlt();
   }
-
 
 }
