@@ -2,6 +2,8 @@ import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import * as WaveSurfer from 'wavesurfer.js';
 import WaveformData from 'waveform-data';
 import * as RecordRTC from 'recordrtc';
+import { ChartDataSets, ChartOptions } from 'chart.js';
+import { Color, Label } from 'ng2-charts';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -30,7 +32,6 @@ export class AppComponent {
   @ViewChild('myCanvas') canvas: ElementRef<HTMLCanvasElement>;
   canvasCtx: CanvasRenderingContext2D;
 
-  multi: any[] = [];
   view: any[] = [700, 300];
 
   // options
@@ -38,17 +39,40 @@ export class AppComponent {
   animations: boolean = true;
   xAxis: boolean = true;
   yAxis: boolean = true;
-  showXAxisLabel: boolean = false;
+  showYAxisLabel: boolean = true;
+  showXAxisLabel: boolean = true;
   timeline: boolean = true;
+
+  colorScheme = {
+    domain: ['#5AA454', '#E44D25', '#CFC0BB', '#7aa3e5', '#a8385d', '#aae3f5']
+  };
 
   pitch = 0;
 
   bufferlength = 2048;
   buffer = new Float32Array(this.bufferlength);
 
-  colorScheme = {
-    domain: ['#5AA454', '#E44D25', '#CFC0BB', '#7aa3e5', '#a8385d', '#aae3f5']
-  };
+  chart = [
+    {
+      name: 'Saw Bean',
+      series: []
+    }
+  ];
+
+  public lineChartData = [
+    { data: [], label: 'Series A' },
+  ];
+  public lineChartLabels = [];
+
+  public lineChartColors: Color[] = [
+    {
+      borderColor: 'black',
+      backgroundColor: 'rgba(255,0,0,0.3)',
+    },
+  ];
+  public lineChartLegend = true;
+  public lineChartType = 'line';
+  public lineChartPlugins = [];
 
   constructor(
     private elementRef: ElementRef,
@@ -105,6 +129,9 @@ export class AppComponent {
     this.streamData.getTracks().forEach(function (track) {
       track.stop();
     });
+    this.lineChartLabels = this.lineChartData[0]['data'].filter((x, y) => {
+      return y.toString();
+    })
     this.audioCtx.close();
     cancelAnimationFrame(this.drawVisual);
     this.recordRTC.stopRecording(() => {
@@ -116,16 +143,6 @@ export class AppComponent {
     console.log('1: ', this.audioBufferArray);
     console.log('2: ', new Uint8Array(this.audioBufferArray));
     console.log('Record RTC: ', this.recordRTC);
-
-    this.multi.push({ "name": "Test", series: [] });
-
-    this.multi = this.multi.map(x => {
-      this.audioBufferArray.forEach((y, i) => {
-        x.series.push({ name: `Test${i}`, value: y });
-      })
-      return x;
-    })
-    console.log('multi', this.multi)
 
     // this.createDownloadLink(new Uint8Array(this.audioBufferArray));
   }
@@ -251,6 +268,37 @@ export class AppComponent {
     } else {
       this.pitch = ac;
     }
+
+    let time = 0;
+    let sec = 1000;
+    var interval = setInterval(() => {
+      time += sec;
+      if (this.audioCtx.state == 'running') {
+        // this.multi = this.multi.map(x => {
+        //   this.audioBufferArray.forEach((y, i) => {
+        //     x.series.push({ name: `Test${i}`, value: this.pitch });
+        //   })
+        //   return x;
+        // })
+        // console.log('multi', this.multi);
+        // this.chart[0]['series'].push({ name: time, value: this.pitch });
+        // this.chart[0]['series'] = this.chart[0]['series'].reduce((x, y) => {
+        //   const z = x.find(item => item.place === y.place);
+        //   if (!z) {
+        //     return x.concat([y]);
+        //   } else {
+        //     return x;
+        //   }
+        // }, []);
+        // console.log('Chart: ', this.chart);
+        // console.log(JSON.stringify(this.chart))
+        this.lineChartData[0]['data'].push(this.pitch);
+
+        console.log('asdasd: ', this.lineChartData);
+      } else {
+        clearInterval(interval);
+      }
+    }, sec);
 
   }
 
