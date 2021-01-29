@@ -1,7 +1,7 @@
 <div class="wrapper" #wrapper>
 
-  <button type="button" (click)="startRecording()">Record</button>
-  <button type="button" (click)="stopRecording()">Stop</button>
+  <button type="button" class="btn btn-primary" (click)="startRecording()">Record</button>&nbsp;
+  <button type="button" class="btn btn-danger" (click)="stopRecording()">Stop</button>
 
   <canvas class="visualizer" width="640" height="100" #myCanvas></canvas>
 
@@ -15,9 +15,12 @@
   </div>
 </div>
 
-<div class="pitch"><span id="pitch">{{pitch}}</span>Hz</div>
-<div style="display: block;">
-  <canvas baseChart width="400" height="400" [datasets]="lineChartData" [labels]="lineChartLabels"
-    [colors]="lineChartColors" [legend]="lineChartLegend" [chartType]="lineChartType" [plugins]="lineChartPlugins">
+<div class="pitch"><span id="pitch">Pitch: {{pitch.toFixed(2)}}</span>Hz</div>
+<div>
+  <canvas *ngIf="displayLineGraph" baseChart width="400" height="400" [datasets]="lineChartData"
+    [labels]="lineChartLabels" [colors]="lineChartColors" [legend]="lineChartLegend" [chartType]="lineChartType"
+    [options]="chartOptions" [plugins]="lineChartPlugins">
   </canvas>
 </div>
+
+<div id="chartdiv"></div>

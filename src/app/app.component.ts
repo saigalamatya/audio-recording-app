@@ -31,6 +31,7 @@ export class AppComponent {
   // @ViewChild('wrapper') wrapper: ElementRef;
   @ViewChild('myCanvas') canvas: ElementRef<HTMLCanvasElement>;
   canvasCtx: CanvasRenderingContext2D;
+  displayLineGraph = false;
 
   pitch = 0;
 
@@ -45,7 +46,7 @@ export class AppComponent {
   ];
 
   public lineChartData = [
-    { data: [], label: 'Series A' },
+    { data: [], label: 'Pitch' },
   ];
   public lineChartLabels = [];
 
@@ -58,6 +59,11 @@ export class AppComponent {
   public lineChartLegend = true;
   public lineChartType = 'line';
   public lineChartPlugins = [];
+  public chartOptions: (ChartOptions) = {
+    responsive: true,
+    maintainAspectRatio: false,
+    spanGaps: false
+  };
 
   constructor(
     private elementRef: ElementRef,
@@ -114,9 +120,10 @@ export class AppComponent {
     this.streamData.getTracks().forEach(function (track) {
       track.stop();
     });
-    this.lineChartLabels = this.lineChartData[0]['data'].filter((x, y) => {
-      return y.toString();
-    })
+    this.lineChartLabels = this.lineChartData[0]['data'].map((x, index) => {
+      return index.toString();
+    });
+    this.displayLineGraph = true;
     this.audioCtx.close();
     cancelAnimationFrame(this.drawVisual);
     this.recordRTC.stopRecording(() => {
@@ -259,7 +266,7 @@ export class AppComponent {
     var interval = setInterval(() => {
       time += sec;
       if (this.audioCtx.state == 'running') {
-        this.lineChartData[0]['data'].push(this.pitch);
+        this.lineChartData[0]['data'].push(this.pitch.toFixed(2));
 
         console.log('asdasd: ', this.lineChartData);
       } else {
