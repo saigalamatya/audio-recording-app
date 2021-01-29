@@ -32,21 +32,6 @@ export class AppComponent {
   @ViewChild('myCanvas') canvas: ElementRef<HTMLCanvasElement>;
   canvasCtx: CanvasRenderingContext2D;
 
-  view: any[] = [700, 300];
-
-  // options
-  showLabels: boolean = false;
-  animations: boolean = true;
-  xAxis: boolean = true;
-  yAxis: boolean = true;
-  showYAxisLabel: boolean = true;
-  showXAxisLabel: boolean = true;
-  timeline: boolean = true;
-
-  colorScheme = {
-    domain: ['#5AA454', '#E44D25', '#CFC0BB', '#7aa3e5', '#a8385d', '#aae3f5']
-  };
-
   pitch = 0;
 
   bufferlength = 2048;
@@ -274,24 +259,6 @@ export class AppComponent {
     var interval = setInterval(() => {
       time += sec;
       if (this.audioCtx.state == 'running') {
-        // this.multi = this.multi.map(x => {
-        //   this.audioBufferArray.forEach((y, i) => {
-        //     x.series.push({ name: `Test${i}`, value: this.pitch });
-        //   })
-        //   return x;
-        // })
-        // console.log('multi', this.multi);
-        // this.chart[0]['series'].push({ name: time, value: this.pitch });
-        // this.chart[0]['series'] = this.chart[0]['series'].reduce((x, y) => {
-        //   const z = x.find(item => item.place === y.place);
-        //   if (!z) {
-        //     return x.concat([y]);
-        //   } else {
-        //     return x;
-        //   }
-        // }, []);
-        // console.log('Chart: ', this.chart);
-        // console.log(JSON.stringify(this.chart))
         this.lineChartData[0]['data'].push(this.pitch);
 
         console.log('asdasd: ', this.lineChartData);
