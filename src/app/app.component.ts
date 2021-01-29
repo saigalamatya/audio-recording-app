@@ -1,9 +1,14 @@
-import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, NgZone, PLATFORM_ID, Renderer2, ViewChild } from '@angular/core';
 import * as WaveSurfer from 'wavesurfer.js';
 import WaveformData from 'waveform-data';
 import * as RecordRTC from 'recordrtc';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
+
+import * as am4core from "@amcharts/amcharts4/core";
+import * as am4charts from "@amcharts/amcharts4/charts";
+import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import { isPlatformBrowser } from '@angular/common';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -65,9 +70,12 @@ export class AppComponent {
     spanGaps: false
   };
 
+  private amChart: am4charts.XYChart;
+
   constructor(
     private elementRef: ElementRef,
-    private _renderer: Renderer2
+    private _renderer: Renderer2,
+    @Inject(PLATFORM_ID) private platformId, private zone: NgZone
   ) {
   }
 
@@ -123,6 +131,7 @@ export class AppComponent {
     this.lineChartLabels = this.lineChartData[0]['data'].map((x, index) => {
       return index.toString();
     });
+    this.generateChartData();
     this.displayLineGraph = true;
     this.audioCtx.close();
     cancelAnimationFrame(this.drawVisual);
@@ -319,6 +328,46 @@ export class AppComponent {
     if (a) T0 = T0 - b / (2 * a);
 
     return sampleRate / T0;
+  }
+
+  generateChartData() {
+    am4core.useTheme(am4themes_animated);
+
+    let chart = am4core.create("chartdiv", am4charts.XYChart);
+
+    chart.paddingRight = 20;
+
+    let data = [];
+    let visits = 10;
+    for (let i = 1; i < this.lineChartData[0]['data'].length; i++) {
+      // visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+      data.push({ date: new Date(2018, 0, i), name: "name" + i, value: this.lineChartData[0]['data'][i] });
+    }
+
+    chart.data = data;
+
+    let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.grid.template.location = 0;
+
+    let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.disabled = true;
+    valueAxis.renderer.minWidth = 35;
+
+    let series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "value";
+    series.tooltipText = "{valueY.value}";
+
+    chart.cursor = new am4charts.XYCursor();
+
+    let scrollbarX = new am4charts.XYChartScrollbar();
+    scrollbarX.series.push(series);
+    chart.scrollbarX = scrollbarX;
+
+    this.amChart = chart;
+
+    console.log('Data: ', data, dateAxis, valueAxis);
+    console.log(JSON.stringify(data));
   }
 
 }
