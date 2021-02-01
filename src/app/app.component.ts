@@ -391,6 +391,8 @@ export class AppComponent {
     series.dataFields.categoryX = "category";
     series.strokeWidth = 3;
     series.xAxis = categoryAxis1;
+    series.tensionX = 0.77;
+    series.bullets.push(new am4charts.CircleBullet());
 
     chart.cursor = new am4charts.XYCursor();
 
