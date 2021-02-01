@@ -168,7 +168,6 @@ export class AppComponent {
     console.log('1: ', this.audioBufferArray);
     console.log('2: ', new Uint8Array(this.audioBufferArray));
     console.log('Record RTC: ', this.recordRTC);
-
     // this.createDownloadLink(new Uint8Array(this.audioBufferArray));
   }
 
@@ -362,25 +361,36 @@ export class AppComponent {
     chart.paddingRight = 20;
 
     let data = [];
-    let visits = 10;
-    for (let i = 1; i < this.lineChartData[0]['data'].length; i++) {
-      // visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-      data.push({ date: new Date(2018, 0, i), name: "name" + i, value: this.lineChartData[0]['data'][i] });
+    if (this.hideZeroes) {
+      for (let i = 1; i < this.pitchDataPoints.length; i++) {
+        // visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+        if (this.pitchDataPoints[i] != 0)
+          // data.push({ date: new Date(2018, 0, i), name: "name" + i, value: this.pitchDataPoints[i] });
+          data.push({ category: i, value: this.pitchDataPoints[i] });
+      }
+    } else {
+      for (let i = 1; i < this.pitchDataPoints.length; i++) {
+        // visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+        // data.push({ date: new Date(2018, 0, i), name: "name" + i, value: this.pitchDataPoints[i] });
+        data.push({ category: i, value: this.pitchDataPoints[i] });
+      }
     }
 
     chart.data = data;
 
-    let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.renderer.grid.template.location = 0;
+    // Create axes
+    var categoryAxis1 = chart.xAxes.push(new am4charts.CategoryAxis());
+    categoryAxis1.dataFields.category = "category";
+    categoryAxis1.renderer.grid.template.location = 0;
 
-    let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-    valueAxis.tooltip.disabled = true;
-    valueAxis.renderer.minWidth = 35;
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
-    let series = chart.series.push(new am4charts.LineSeries());
-    series.dataFields.dateX = "date";
+    // Create series
+    var series = chart.series.push(new am4charts.LineSeries());
     series.dataFields.valueY = "value";
-    series.tooltipText = "{valueY.value}";
+    series.dataFields.categoryX = "category";
+    series.strokeWidth = 3;
+    series.xAxis = categoryAxis1;
 
     chart.cursor = new am4charts.XYCursor();
 
@@ -389,9 +399,6 @@ export class AppComponent {
     chart.scrollbarX = scrollbarX;
 
     this.amChart = chart;
-
-    console.log('Data: ', data, dateAxis, valueAxis);
-    console.log(JSON.stringify(data));
   }
 
   togglePitchDisplay() {
@@ -399,10 +406,16 @@ export class AppComponent {
     if (this.hideZeroes) {
       this.pitchShowHideText = 'Show zeroes';
       this.lineChartData[0]['data'] = this.lineChartData[0]['data'].filter(x => x != 0);
+
     } else {
       this.pitchShowHideText = 'Hide zeroes';
       this.lineChartData[0]['data'] = this.pitchDataPoints;
     }
+    this.generateChartData();
+  }
+
+  toggleScroll() {
+    console.log('Toggle scrolled:');
   }
 
 }
