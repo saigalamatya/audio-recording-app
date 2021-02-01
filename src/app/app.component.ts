@@ -33,6 +33,12 @@ export class AppComponent {
 
   recordRTC;
 
+  url;
+  au;
+  li;
+  link;
+  wavesurfer;
+
   // @ViewChild('wrapper') wrapper: ElementRef;
   @ViewChild('myCanvas') canvas: ElementRef<HTMLCanvasElement>;
   canvasCtx: CanvasRenderingContext2D;
@@ -53,6 +59,7 @@ export class AppComponent {
   public lineChartData = [
     { data: [], label: 'Pitch' },
   ];
+
   public lineChartLabels = [];
 
   public lineChartColors: Color[] = [
@@ -71,6 +78,10 @@ export class AppComponent {
   };
 
   private amChart: am4charts.XYChart;
+  hideZeroes = false;
+  pitchShowHideText = 'Hide zeroes';
+  pitchDataPoints = [];
+  recordCompleted = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -86,7 +97,18 @@ export class AppComponent {
   }
 
   startRecording() {
+    this.recordCompleted = false;
 
+    if (this.au && this.li && this.link) {
+      this.url = null;
+      this._renderer.removeChild(this.elementRef.nativeElement, this.au);
+      this._renderer.removeChild(this.elementRef.nativeElement, this.li);
+      this._renderer.removeChild(this.elementRef.nativeElement, this.link);
+    }
+
+    if (this.wavesurfer) {
+      this.wavesurfer.destroy();
+    }
     this.audioCtx = new AudioContext();
 
     this.analyser = this.audioCtx.createAnalyser();
@@ -121,16 +143,18 @@ export class AppComponent {
           this.visualize();
         }
       )
-
   }
 
   stopRecording() {
+    this.recordCompleted = true;
+
     this.streamData.getTracks().forEach(function (track) {
       track.stop();
     });
     this.lineChartLabels = this.lineChartData[0]['data'].map((x, index) => {
       return index.toString();
     });
+    this.pitchDataPoints = this.lineChartData[0]['data'];
     this.generateChartData();
     this.displayLineGraph = true;
     this.audioCtx.close();
@@ -155,14 +179,14 @@ export class AppComponent {
 
     console.log('Blob: ', blob);
 
-    var url = URL.createObjectURL(blob);
-    var au = document.createElement('audio');
-    var li = document.createElement('li');
-    var link = document.createElement('a');
+    this.url = URL.createObjectURL(blob);
+    this.au = document.createElement('audio');
+    this.li = document.createElement('li');
+    this.link = document.createElement('a');
 
-    this._renderer.appendChild(this.elementRef.nativeElement, au);
-    this._renderer.appendChild(this.elementRef.nativeElement, li);
-    this._renderer.appendChild(this.elementRef.nativeElement, link);
+    this._renderer.appendChild(this.elementRef.nativeElement, this.au);
+    this._renderer.appendChild(this.elementRef.nativeElement, this.li);
+    this._renderer.appendChild(this.elementRef.nativeElement, this.link);
 
     var filename = new Date().toISOString();
     console.log('File name: ', filename);
@@ -173,17 +197,17 @@ export class AppComponent {
     });
     console.log('Audio file: ', audioFile);
 
-    au.controls = true;
-    au.src = url;
+    this.au.controls = true;
+    this.au.src = this.url;
 
     //link the a element to the blob 
-    link.href = url;
-    link.download = new Date().toISOString() + '.wav';
+    this.link.href = this.url;
+    this.link.download = new Date().toISOString() + '.wav';
 
-    console.log('Audio: ', au);
-    au.play();
+    console.log('Audio: ', this.au);
+    this.au.play();
 
-    var wavesurfer = WaveSurfer.create({
+    this.wavesurfer = WaveSurfer.create({
       container: document.querySelector('#waveform'),
       barWidth: 2,
       barHeight: 1, // the height of the wave
@@ -191,10 +215,10 @@ export class AppComponent {
       waveColor: 'violet',
       progressColor: 'purple'
     });
-    console.log('Wave surfer: ', wavesurfer);
-    wavesurfer.loadBlob(blob);
-    wavesurfer.on('ready', function () {
-      wavesurfer.play();
+    console.log('Wave surfer: ', this.wavesurfer);
+    this.wavesurfer.loadBlob(blob);
+    this.wavesurfer.on('ready', function () {
+      this.wavesurfer.play();
     });
   }
 
@@ -368,6 +392,17 @@ export class AppComponent {
 
     console.log('Data: ', data, dateAxis, valueAxis);
     console.log(JSON.stringify(data));
+  }
+
+  togglePitchDisplay() {
+    this.hideZeroes = !this.hideZeroes;
+    if (this.hideZeroes) {
+      this.pitchShowHideText = 'Show zeroes';
+      this.lineChartData[0]['data'] = this.lineChartData[0]['data'].filter(x => x != 0);
+    } else {
+      this.pitchShowHideText = 'Hide zeroes';
+      this.lineChartData[0]['data'] = this.pitchDataPoints;
+    }
   }
 
 }

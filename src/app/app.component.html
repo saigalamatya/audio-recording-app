@@ -16,11 +16,15 @@
 </div>
 
 <div class="pitch"><span id="pitch">Pitch: {{pitch.toFixed(2)}}</span>Hz</div>
-<div>
+<div *ngIf="recordCompleted">
+  <div class="form-group form-check">
+    <input type="checkbox" class="form-check-input" id="exampleCheck1" (change)="togglePitchDisplay()">
+    <label class="form-check-label" for="exampleCheck1">{{pitchShowHideText}}</label>
+  </div>
   <canvas *ngIf="displayLineGraph" baseChart width="400" height="400" [datasets]="lineChartData"
     [labels]="lineChartLabels" [colors]="lineChartColors" [legend]="lineChartLegend" [chartType]="lineChartType"
     [options]="chartOptions" [plugins]="lineChartPlugins">
   </canvas>
 </div>
 
-<div id="chartdiv" style="width: 100%; height: 500px"></div>
+<!-- <div id="chartdiv" style="width: 100%; height: 500px"></div> -->
