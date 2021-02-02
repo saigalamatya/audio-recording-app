@@ -8,7 +8,6 @@ import { Color, Label } from 'ng2-charts';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import { isPlatformBrowser } from '@angular/common';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -78,6 +77,11 @@ export class AppComponent {
   };
 
   private amChart: am4charts.XYChart;
+  categoryAxis;
+  series;
+  valueAxis;
+  scrollbarX;
+
   hideZeroes = false;
   pitchShowHideText = 'Hide zeroes';
   pitchDataPoints = [];
@@ -356,9 +360,9 @@ export class AppComponent {
   generateChartData() {
     am4core.useTheme(am4themes_animated);
 
-    let chart = am4core.create("chartdiv", am4charts.XYChart);
+    this.amChart = am4core.create("chartdiv", am4charts.XYChart);
 
-    chart.paddingRight = 20;
+    this.amChart.paddingRight = 20;
 
     let data = [];
     if (this.hideZeroes) {
@@ -376,31 +380,35 @@ export class AppComponent {
       }
     }
 
-    chart.data = data;
+    this.amChart.data = data;
 
     // Create axes
-    var categoryAxis1 = chart.xAxes.push(new am4charts.CategoryAxis());
-    categoryAxis1.dataFields.category = "category";
-    categoryAxis1.renderer.grid.template.location = 0;
+    this.categoryAxis = this.amChart.xAxes.push(new am4charts.CategoryAxis());
+    this.categoryAxis.dataFields.category = "category";
+    this.categoryAxis.renderer.grid.template.location = 0;
 
-    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    this.valueAxis = this.amChart.yAxes.push(new am4charts.ValueAxis());
 
     // Create series
-    var series = chart.series.push(new am4charts.LineSeries());
-    series.dataFields.valueY = "value";
-    series.dataFields.categoryX = "category";
-    series.strokeWidth = 3;
-    series.xAxis = categoryAxis1;
-    series.tensionX = 0.77;
-    series.bullets.push(new am4charts.CircleBullet());
+    this.series = this.amChart.series.push(new am4charts.LineSeries());
+    this.series.dataFields.valueY = "value";
+    this.series.dataFields.categoryX = "category";
+    this.series.tooltipText = "{valueY}";
+    this.series.strokeWidth = 3;
+    this.series.xAxis = this.categoryAxis;
+    this.series.tensionX = 0.77;
+    this.series.bullets.push(new am4charts.CircleBullet());
 
-    chart.cursor = new am4charts.XYCursor();
+    this.amChart.cursor = new am4charts.XYCursor();
 
-    let scrollbarX = new am4charts.XYChartScrollbar();
-    scrollbarX.series.push(series);
-    chart.scrollbarX = scrollbarX;
+    this.scrollbarX = new am4charts.XYChartScrollbar();
+    this.scrollbarX.series.push(this.series);
+    this.amChart.scrollbarX = this.scrollbarX;
 
-    this.amChart = chart;
+    console.log('Scroll bar: ', this.scrollbarX);
+    console.log('Series: ', this.series);
+
+    this.amChart = this.amChart;
   }
 
   togglePitchDisplay() {
