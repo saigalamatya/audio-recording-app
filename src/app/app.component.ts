@@ -1,9 +1,6 @@
 import { Component, ElementRef, Inject, NgZone, PLATFORM_ID, Renderer2, ViewChild } from '@angular/core';
 import * as WaveSurfer from 'wavesurfer.js';
-import WaveformData from 'waveform-data';
 import * as RecordRTC from 'recordrtc';
-import { ChartDataSets, ChartOptions } from 'chart.js';
-import { Color, Label } from 'ng2-charts';
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -58,23 +55,6 @@ export class AppComponent {
   public lineChartData = [
     { data: [], label: 'Pitch' },
   ];
-
-  public lineChartLabels = [];
-
-  public lineChartColors: Color[] = [
-    {
-      borderColor: 'black',
-      backgroundColor: 'rgba(255,0,0,0.3)',
-    },
-  ];
-  public lineChartLegend = true;
-  public lineChartType = 'line';
-  public lineChartPlugins = [];
-  public chartOptions: (ChartOptions) = {
-    responsive: true,
-    maintainAspectRatio: false,
-    spanGaps: false
-  };
 
   private amChart: am4charts.XYChart;
   categoryAxis;
@@ -154,9 +134,6 @@ export class AppComponent {
 
     this.streamData.getTracks().forEach(function (track) {
       track.stop();
-    });
-    this.lineChartLabels = this.lineChartData[0]['data'].map((x, index) => {
-      return index.toString();
     });
     this.pitchDataPoints = this.lineChartData[0]['data'];
     this.generateChartData();
