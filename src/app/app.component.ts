@@ -486,10 +486,13 @@ export class AppComponent {
     )
   );
 
-  public rangeValue: Object = [31, 46];
-
+  public rangeValue: Object = [];
   public annotations: Object = chartAnnotation;
-
+  public marker: Object = {
+    visible: true,
+    height: 10,
+    width: 10
+  };
   public tooltip: Object = { enable: true };
 
   // public legendSettings: Object = { visible: false };
