@@ -5,6 +5,48 @@ import * as RecordRTC from 'recordrtc';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import { sl } from "./double_data";
+import { Browser } from "@syncfusion/ej2-base";
+
+import {
+  ChartTheme,
+  ChartAnnotation,
+  ILoadedEventArgs,
+  ChartAnnotationSettingsModel,
+  getSeriesColor,
+  IRangeLoadedEventArgs,
+  DateTime,
+  StepLineSeries,
+  Chart,
+  IChangedEventArgs,
+  IRangeTooltipRenderEventArgs,
+  RangeTooltip,
+  IAxisLabelRenderEventArgs
+} from "@syncfusion/ej2-charts";
+
+// ej2-chart
+/**
+ * Sample for range navigator with numeric axis
+ */
+
+let selectedTheme: string = location.hash.split("/")[1];
+selectedTheme = selectedTheme ? selectedTheme : "Material";
+let theme: ChartTheme = <ChartTheme>(
+  (selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)).replace(
+    /-dark/i,
+    "Dark"
+  )
+);
+let chartAnnotation: ChartAnnotationSettingsModel[] = [];
+chartAnnotation.push({
+  content: '<div id="exchangeRate"></div>',
+  coordinateUnits: "Pixel",
+  region: "Chart",
+  x: "85%",
+  y: "15%"
+});
+let backgroundColor: string = "white";
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -137,6 +179,7 @@ export class AppComponent {
     });
     this.pitchDataPoints = this.lineChartData[0]['data'];
     this.generateChartData();
+    this.getAnnotaiton(this.lineChartData[0]['data'], getSeriesColor(theme)[1]);
     this.displayLineGraph = true;
     this.audioCtx.close();
     cancelAnimationFrame(this.drawVisual);
@@ -399,10 +442,147 @@ export class AppComponent {
       this.lineChartData[0]['data'] = this.pitchDataPoints;
     }
     this.generateChartData();
+    this.getAnnotaiton(this.lineChartData[0]['data'], getSeriesColor(theme)[1]);
   }
 
   toggleScroll() {
     console.log('Toggle scrolled:');
+  }
+
+  // ej2-chart
+  @ViewChild("chartDouble")
+  public Chart: Chart;
+
+  public primaryXAxis: Object = {
+    title: "Index",
+    edgeLabelPlacement: "Shift",
+    majorGridLines: { width: 0 },
+    labelFormat: "n1"
+  };
+
+  public dataSource1: Object[];
+
+  public chartArea: Object = { border: { width: 0 } };
+
+  public primaryYAxis: Object = {
+    title: "Pitch",
+    minimum: 0,
+    majorTickLines: { width: 0 },
+    lineStyle: { width: 0 }
+  };
+
+  public chartTooltip: Object = { enable: true, shared: true };
+
+  public chartHeight: string = "350";
+
+  public animation: Object = { enable: false };
+
+  public width: string = Browser.isDevice ? "100%" : "80%";
+
+  public theme: ChartTheme = <ChartTheme>(
+    (selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)).replace(
+      /-dark/i,
+      "Dark"
+    )
+  );
+
+  public rangeValue: Object = [31, 46];
+
+  public annotations: Object = chartAnnotation;
+
+  public tooltip: Object = { enable: true };
+
+  // public legendSettings: Object = { visible: false };
+
+  public getAnnotaiton(args, color: string): void {
+    console.log('Args: ', args);
+    args = args.map((data, i) => {
+      return {
+        x: i + 1,
+        y: parseFloat(data)
+      }
+    });
+    console.log('args:ASDasd', args)
+    for (let i: number = 0; i < args.length; i++) {
+      /* tslint:disable:no-string-literal */
+      // if (args[i]["isWicket"]) {
+      chartAnnotation.push({
+        // content:
+        //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
+        //   "background: " +
+        //   backgroundColor +
+        //   "; border: 2px solid " +
+        //   color +
+        //   "; color:" +
+        //   color +
+        //   '">W</div>',
+        /* tslint:disable:no-string-literal */
+        x: args[i]["x"],
+        /* tslint:disable:no-string-literal */
+        y: args[i]["y"],
+        coordinateUnits: "Point"
+      });
+      // }
+    }
+    this.rangeValue = [args[0]['x'], args[args.length - 1]['x']];
+    this.dataSource1 = args;
+    console.log('Range value: ', this.rangeValue);
+    console.log('data source: ', this.dataSource1);
+  }
+
+  public axisLabelRender(args: IAxisLabelRenderEventArgs): void {
+    if (args.axis.orientation === "Horizontal") {
+      let value: number = Math.abs(Number(args.text));
+      args.text = String(value);
+    }
+  }
+
+  public loaded(args: ILoadedEventArgs): void {
+    // let series1: string = args.chart.visibleSeries[0].interior;
+    // let series2: string = args.chart.visibleSeries[1].interior;
+    // // let html: string = "<table></table>";
+    // // html +=
+    // //   '<tr><td><div style="width:10px; height: 10px; border: 2px solid ' +
+    // //   series1 +
+    // //   "; background: " +
+    // //   series1 +
+    // //   ';"></div></td><td style="padding-left:10px;">' +
+    // //   " Australia" +
+    // //   "</td>";
+    // // html +=
+    // //   '<tr><td><div style="width:10px; height: 10px; border: 2px solid ' +
+    // //   series2 +
+    // //   "; background: " +
+    // //   series2 +
+    // //   ';"></div></td><td style="padding-left:10px;">' +
+    // //   " Sri Lanka" +
+    // //   "</td>";
+    // // html += "</table>";
+    // this.Chart.setAnnotationValue(
+    //   0,
+    //   '<div id="exchangeRate" style="line-height: 18px;' +
+    //   "font-size: 13px;background: #fff; opacity:0.9; color: #464e56; " +
+    //   " box-shadow:0 0 8px 0 rgba(70,78,86,.25); padding: 7px 10px;" +
+    //   'border-radius: 3px">' +
+    //   "</div>"
+    // );
+  }
+
+  public tooltipRender(args: IRangeTooltipRenderEventArgs): void {
+    args.text[0] = Math.round(parseInt(args.text[0], 10)).toString();
+  }
+
+  public load(args: IRangeLoadedEventArgs) {
+    args.rangeNavigator.rangeTooltipModule = new RangeTooltip(
+      args.rangeNavigator
+    );
+  }
+
+  public changed(args: IChangedEventArgs): void {
+    console.log("Changed: ", args);
+    this.Chart.primaryXAxis.zoomFactor = args.zoomFactor;
+    this.Chart.primaryXAxis.zoomPosition = args.zoomPosition;
+    this.Chart.dataBind();
   }
 
 }
