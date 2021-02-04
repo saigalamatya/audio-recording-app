@@ -465,7 +465,7 @@ export class AppComponent {
     labelFormat: "n1"
   };
 
-  public dataSource1: Object[];
+  public dataSource: Object[];
 
   public chartArea: Object = { border: { width: 0 } };
 
@@ -500,7 +500,7 @@ export class AppComponent {
   };
   public tooltip: Object = { enable: true };
 
-  // public legendSettings: Object = { visible: false };
+  public legendSettings: Object = { visible: false };
 
   public getAnnotaiton(args, color: string): void {
     console.log('Args: ', args);
@@ -533,9 +533,9 @@ export class AppComponent {
       // }
     }
     this.rangeValue = [args[0]['x'], args[args.length - 1]['x']];
-    this.dataSource1 = args;
+    this.dataSource = args;
     console.log('Range value: ', this.rangeValue);
-    console.log('data source: ', this.dataSource1);
+    console.log('data source: ', this.dataSource);
   }
 
   public axisLabelRender(args: IAxisLabelRenderEventArgs): void {
@@ -589,14 +589,15 @@ export class AppComponent {
   public changed(args: IChangedEventArgs): void {
     this.rangeAverage = 0;
     console.log("Changed: ", args);
-    // this.Chart.primaryXAxis.zoomFactor = args.zoomFactor;
-    // this.Chart.primaryXAxis.zoomPosition = args.zoomPosition;
-    // this.Chart.dataBind();
+    this.Chart.primaryXAxis.zoomFactor = args.zoomFactor;
+    this.Chart.primaryXAxis.zoomPosition = args.zoomPosition;
+    this.Chart.dataBind();
     let sum: any = 0;
     for (let i = 0; i < args.selectedData.length; i++) {
       sum += args.selectedData[i]['y'];
     }
-    this.rangeValue = [args.start, args.end];
+    // this.rangeValue = [Math.round(args.start), Math.round(args.end)];
+    // console.log('Range value: ', this.rangeValue);
     this.rangeAverage = Math.round((sum / args.selectedData.length + Number.EPSILON) * 100) / 100;
     console.log('Average pitch: ', this.rangeAverage);
   }
