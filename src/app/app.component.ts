@@ -596,6 +596,7 @@ export class AppComponent {
     for (let i = 0; i < args.selectedData.length; i++) {
       sum += args.selectedData[i]['y'];
     }
+    this.rangeValue = [args.start, args.end];
     this.rangeAverage = Math.round((sum / args.selectedData.length + Number.EPSILON) * 100) / 100;
     console.log('Average pitch: ', this.rangeAverage);
   }
