@@ -25,33 +25,56 @@
 
 <!-- <div id="chartdiv" style="width: 100%; height: 500px"></div> -->
 
-<div class="control-section" *ngIf="recordCompleted">
-  <div class="row" align="center">
-    <div align="center">
-      <ejs-rangenavigator style='display:block' align='center' id='containerDouble' [value]='rangeValue'
-        labelPosition='Outside' [width]='width' (changed)='changed($event)' [tooltip]='tooltip' [theme]='theme'
-        (tooltipRender)='tooltipRender($event)' (load)='load($event)'>
-        <e-rangenavigator-series-collection>
-          <!-- <e-rangenavigator-series [dataSource]='dataSource' xName='x' yName='y' width=2 name='AUS'>
+<div class="container">
+  <div class="control-section" *ngIf="recordCompleted">
+    Average pitch of selected range: {{rangeAverage}} Hz
+    <button type="button" class="btn btn-success" (click)="addToRollingAverage()">Add to Rolling Average</button>
+    <div class="row" align="center">
+      <div align="center">
+        <ejs-rangenavigator style='display:block' align='center' id='containerDouble' [value]='rangeValue'
+          labelPosition='Outside' [width]='width' (changed)='changed($event)' [theme]='theme'
+          (tooltipRender)='tooltipRender($event)' (load)='load($event)'>
+          <e-rangenavigator-series-collection>
+            <!-- <e-rangenavigator-series [dataSource]='dataSource' xName='x' yName='y' width=2 name='AUS'>
           </e-rangenavigator-series> -->
-          <e-rangenavigator-series [dataSource]='dataSource1' xName='x' yName='y' width=2 name='SL'>
-          </e-rangenavigator-series>
-        </e-rangenavigator-series-collection>
-      </ejs-rangenavigator>
-    </div>
-    <div align="center">
-      <ejs-chart #chartDouble style='display:block;' id='chartDouble' align='center' [chartArea]='chartArea'
-        [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis' height='350' [theme]='theme'
-        [annotations]='annotations' (loaded)='loaded($event)' (axisLabelRender)='axisLabelRender($event)'>
-        <!--      [legendSettings]='legendSettings'-->
-        <e-series-collection>
-          <!-- <e-series [dataSource]='dataSource' name='Value' type='Spline' xName='x' yName='y' width='2'
+            <e-rangenavigator-series [dataSource]='dataSource1' xName='x' yName='y' width=2 name='SL'>
+            </e-rangenavigator-series>
+          </e-rangenavigator-series-collection>
+        </ejs-rangenavigator>
+      </div>
+      <div align="center">
+        <ejs-chart #chartDouble style='display:block;' id='chartDouble' align='center' [chartArea]='chartArea'
+          [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis' height='350' [theme]='theme'
+          [tooltip]='tooltip' [annotations]='annotations' (loaded)='loaded($event)'
+          (axisLabelRender)='axisLabelRender($event)'>
+          <!--      [legendSettings]='legendSettings'-->
+          <e-series-collection>
+            <!-- <e-series [dataSource]='dataSource' name='Value' type='Spline' xName='x' yName='y' width='2'
             [animation]='animation'>
           </e-series> -->
-          <e-series [dataSource]='dataSource1' name='Value' type='Spline' xName='x' yName='y' width='2'
-            [marker]="marker" [animation]='animation'>
-          </e-series>
-        </e-series-collection>
-      </ejs-chart>
+            <e-series [dataSource]='dataSource1' name='Value' type='Spline' xName='x' yName='y' width='2'
+              [marker]="marker" [animation]='animation'>
+            </e-series>
+          </e-series-collection>
+        </ejs-chart>
+      </div>
+    </div>
+    <div class="row">
+      <label>Rolling Average Chart</label>
+      <br />
+      <div align="center">
+        <ejs-chart #rollingAverageChart style='display:block;' id='rollingAverageChart' align='center'
+          [chartArea]='chartArea' [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis'
+          height='350' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations' (loaded)='loaded($event)'
+          (axisLabelRender)='axisLabelRender($event)'>
+          <!--      [legendSettings]='legendSettings'-->
+          <e-series-collection>
+            <e-series [dataSource]='rollingAverageDataSource' name='Value' type='Spline' xName='x' yName='y' width='2'
+              [marker]="marker" [animation]='animation'>
+            </e-series>
+          </e-series-collection>
+        </ejs-chart>
+      </div>
     </div>
   </div>
+</div>

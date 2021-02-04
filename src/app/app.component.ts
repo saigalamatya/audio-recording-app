@@ -45,7 +45,6 @@ chartAnnotation.push({
   x: "85%",
   y: "15%"
 });
-let backgroundColor: string = "white";
 
 @Component({
   selector: 'app-root',
@@ -108,6 +107,12 @@ export class AppComponent {
   pitchShowHideText = 'Hide zeroes';
   pitchDataPoints = [];
   recordCompleted = false;
+
+  // for rolling average of pitch
+  rollingAverageDataSource: Object[];
+  rollingAveragePitchDataPoints = [];
+  rangeAverage = 0;
+
 
   constructor(
     private elementRef: ElementRef,
@@ -582,10 +587,63 @@ export class AppComponent {
   }
 
   public changed(args: IChangedEventArgs): void {
+    this.rangeAverage = 0;
     console.log("Changed: ", args);
-    this.Chart.primaryXAxis.zoomFactor = args.zoomFactor;
-    this.Chart.primaryXAxis.zoomPosition = args.zoomPosition;
-    this.Chart.dataBind();
+    // this.Chart.primaryXAxis.zoomFactor = args.zoomFactor;
+    // this.Chart.primaryXAxis.zoomPosition = args.zoomPosition;
+    // this.Chart.dataBind();
+    let sum: any = 0;
+    for (let i = 0; i < args.selectedData.length; i++) {
+      sum += args.selectedData[i]['y'];
+    }
+    this.rangeAverage = Math.round((sum / args.selectedData.length + Number.EPSILON) * 100) / 100;
+    console.log('Average pitch: ', this.rangeAverage);
+  }
+
+  addToRollingAverage() {
+    let index = this.rollingAveragePitchDataPoints.findIndex(x => x == this.rangeAverage);
+    if (index > -1) {
+      if (window.confirm(`The pitch is already in the list. Are you sure you want to add it again?`)) {
+        this.rollingAveragePitchDataPoints.push(this.rangeAverage);
+      }
+    } else {
+      this.rollingAveragePitchDataPoints.push(this.rangeAverage);
+    }
+    console.log('Rolling average data [points]: ', this.rollingAveragePitchDataPoints);
+    this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
+  }
+
+  generateRollingAveragePitchChart(args) {
+    console.log('Args: ', args);
+    args = args.map((data, i) => {
+      return {
+        x: i + 1,
+        y: parseFloat(data)
+      }
+    });
+    console.log('Rolling average data points source: ', args)
+    for (let i: number = 0; i < args.length; i++) {
+      /* tslint:disable:no-string-literal */
+      // if (args[i]["isWicket"]) {
+      chartAnnotation.push({
+        // content:
+        //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
+        //   "background: " +
+        //   backgroundColor +
+        //   "; border: 2px solid " +
+        //   color +
+        //   "; color:" +
+        //   color +
+        //   '">W</div>',
+        /* tslint:disable:no-string-literal */
+        x: args[i]["x"],
+        /* tslint:disable:no-string-literal */
+        y: args[i]["y"],
+        coordinateUnits: "Point"
+      });
+    }
+    this.rollingAverageDataSource = args;
+    console.log('fifififf: ', this.rollingAverageDataSource);
   }
 
 }
