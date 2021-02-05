@@ -487,7 +487,7 @@ export class AppComponent {
 
   public animation: Object = { enable: false };
 
-  public width: string = Browser.isDevice ? "100%" : "80%";
+  public width: string = "1000px";
 
   public theme: ChartTheme = <ChartTheme>(
     (selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)).replace(
