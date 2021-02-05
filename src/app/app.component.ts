@@ -285,29 +285,34 @@ export class AppComponent {
 
       console.log('Draw visual: ', this.drawVisual);
 
-      this.canvasCtx.fillStyle = "rgba(0,0,0,0.2)";
-      // draws a filled rectangle whose starting point is at (x, y)
-      // draws according to current fillStyle(color, gradient, pattern)
+      this.canvasCtx.fillStyle = '#181818'; // draw wave with canvas
       this.canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      var barWidth = (WIDTH / bufferLength) * 2.5;
-      let max_val = -Infinity;
-      let max_index = -1;
-      var barHeight;
+      this.canvasCtx.lineWidth = 2;
+      this.canvasCtx.strokeStyle = '#3cfd2a';
+
+      this.canvasCtx.beginPath();
+
+      var sliceWidth = WIDTH * 1.0 / bufferLength;
       var x = 0;
+
       for (var i = 0; i < bufferLength; i++) {
-        barHeight = dataArray[i];
-        if (barHeight > max_val) {
-          max_val = barHeight;
-          max_index = i;
-          // console.log('Bar height: ', barHeight);
+
+        var v = dataArray[i] / 128.0;
+        var y = v * HEIGHT / 2;
+
+        // console.log('V: ', v, 'Y: ', y, 'slicewidth: ', sliceWidth, 'X: ', x);
+
+        if (i === 0) {
+          this.canvasCtx.moveTo(x, y);
+        } else {
+          this.canvasCtx.lineTo(x, y);
         }
 
-        this.canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
-        this.canvasCtx.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight / 2);
-
-        x += barWidth + 1;
+        x += sliceWidth;
       }
+      this.canvasCtx.lineTo(WIDTH, HEIGHT / 2);
+      this.canvasCtx.stroke();
     }
     drawAlt();
   }
@@ -495,8 +500,8 @@ export class AppComponent {
   public annotations: Object = chartAnnotation;
   public marker: Object = {
     visible: true,
-    height: 10,
-    width: 10
+    height: 5,
+    width: 5
   };
   public tooltip: Object = { enable: true };
 
