@@ -1,5 +1,12 @@
 <div class="container-fluid">
 
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>Welcome!</strong> For the time being the recording length is set to 10 seconds max.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
   <!-- <div class="wrapper" #wrapper> -->
   <div class="btn-group mt-2 mb-2">
     <button *ngIf="!isRecording" type="button" class="btn btn-primary" (click)="startRecording()">Record</button>&nbsp;
@@ -22,14 +29,22 @@
 
   <div class="row">
     <label class="ml-3">Pitch: {{pitch.toFixed(2)}}Hz</label>
-    <div *ngIf="recordCompleted">
+    <!-- <div *ngIf="recordCompleted">
       <div class="form-group form-check">
         <button type="button" class="btn btn-primary" (click)="togglePitchDisplay()">
           {{pitchShowHideText}} </button>
       </div>
+    </div> -->
+  </div>
+  <div class="row">
+    <div class="form-check ml-3" *ngIf="recordCompleted">
+      <input class="form-check-input" type="checkbox" data-toggle="toggle" [checked]="hideZeroes"
+        name="showHideCheckBox" (change)="togglePitchDisplay()">
+      <label class="form-check-label" for="showHideCheckBox">
+        {{pitchShowHideText}}
+      </label>
     </div>
   </div>
-
   <!-- <div id="chartdiv" style="width: 100%; height: 500px"></div> -->
 
   <div class="control-section" *ngIf="recordCompleted">
@@ -41,23 +56,29 @@
     </div> -->
     <form>
       <div class="form-group row">
-        <label for="startingPoint" class="col-sm-2 col-form-label">Starting Point:</label>
+        <label for="startingPoint" class="col-sm-2 col-form-label">Increment size:</label>
         <div class="col-sm-3">
-          <input type="text" class="form-control" name="startingPoint" [(ngModel)]="startingPoint"
-            (change)="changeStartingPoint($event)" placeholder="Enter starting point..." tabindex="1">
+          <input type="text" class="form-control" name="startingPoint" [(ngModel)]="incrementSize"
+            (change)="changeIncrementSize($event)" placeholder="Enter increment size..." tabindex="1">
         </div>
       </div>
       <div class="form-group row">
         <label for="range" class="col-sm-2 col-form-label">Range: </label>
         <div class="col-sm-3">
           <input type="text" class="form-control" name="range" [(ngModel)]="rangeSize"
-            (change)="changeRangeSize($event)" placeholder="Enter range..." [readonly]="!startingPointEntered"
-            [title]="!startingPointEntered ? 'Please enter starting point before entering range.': ''" tabindex="2">
+            (change)="changeRangeSize($event)" placeholder="Enter range..." [readonly]="!incrementSizeEntered"
+            [title]="!incrementSizeEntered ? 'Please enter starting point before entering range.': ''" tabindex="2">
         </div>
       </div>
 
-      <button *ngIf="rangeSize" type="button" class="btn btn-primary" (click)="calculateRollingAverage()">Add to Rolling
-        Average</button>
+      <div class="form-group row">
+        <label for="range" class="col-sm-2 col-form-label"> </label>
+        <button *ngIf="rangeSize" type="button" class="btn btn-primary ml-3"
+          (click)="calculateRollingAverage()">Generate
+          Rolling
+          Average</button>
+      </div>
+
     </form>
     <label>Pitch Chart</label>
     <br />
@@ -103,3 +124,17 @@
     </div>
   </div>
 </div>
+
+<div style="position: relative">
+  <!-- the position of the parent container must be set to relative -->
+  <!-- It is really important to set loaderId for non-master loader -->
+  <ngx-ui-loader [loaderId]="'loader-01'"></ngx-ui-loader>
+</div>
+
+<div style="position: relative">
+  <!-- the position of the parent container must be set to relative -->
+  <!-- It is really important to set loaderId for non-master loader -->
+  <ngx-ui-loader [loaderId]="'loader-02'"></ngx-ui-loader>
+</div>
+
+<ngx-ui-loader [text]="'Generating chart ...'"></ngx-ui-loader>

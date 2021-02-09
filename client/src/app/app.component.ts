@@ -23,6 +23,7 @@ import {
   RangeTooltip,
   IAxisLabelRenderEventArgs
 } from "@syncfusion/ej2-charts";
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 
 // ej2-chart
 /**
@@ -103,8 +104,8 @@ export class AppComponent {
   valueAxis;
   scrollbarX;
 
-  hideZeroes = false;
-  pitchShowHideText = 'Hide zeroes';
+  hideZeroes = true;
+  pitchShowHideText = 'Show zeroes';
   pitchDataPoints = [];
   recordCompleted = false;
   isRecording = false;
@@ -113,14 +114,16 @@ export class AppComponent {
   rollingAverageDataSource: Object[];
   rollingAveragePitchDataPoints = [];
   startingPoint = 0;
+  incrementSize = 0;
   rangeAverage = 0;
   rangeSize = 0;
   rangeFrom = 0;
-  startingPointEntered = false;
+  incrementSizeEntered = false;
 
   constructor(
     private elementRef: ElementRef,
-    private _renderer: Renderer2
+    private _renderer: Renderer2,
+    private _ngxUiLoaderService: NgxUiLoaderService
   ) {
   }
 
@@ -132,6 +135,11 @@ export class AppComponent {
 
   startRecording() {
     this.recordCompleted = false;
+    this.startingPoint = 0;
+    this.rangeAverage = 0;
+    this.rangeSize = 0;
+    this.rangeFrom = 0;
+    this.incrementSizeEntered = false;
 
     if (!this.isRecording) {
       if (this.au && this.li && this.link) {
@@ -167,11 +175,22 @@ export class AppComponent {
 
             var options = {
               type: 'audio',
-              mimeType: 'audio/wav'
+              mimeType: 'audio/wav',
+
             };
 
             this.recordRTC = RecordRTC(stream, options);
             this.recordRTC.startRecording();
+
+            // let timer = 0;
+            // var timerId = setInterval(() => {
+            //   if (timer > 10) {
+            //     this.stopRecording();
+            //     clearInterval(timerId);
+            //   } else {
+            //     timer = timer + 1;
+            //   }
+            // }, 1000);
 
             //start the recording process 
             console.log("Recording started", this.recordRTC);
@@ -184,15 +203,17 @@ export class AppComponent {
   }
 
   stopRecording() {
+    // this._ngxUiLoaderService.start();
     this.recordCompleted = true;
     this.isRecording = false;
 
     this.streamData.getTracks().forEach(function (track) {
       track.stop();
     });
+
     this.pitchDataPoints = this.lineChartData[0]['data'];
     this.generateChartData();
-    this.getAnnotaiton(this.lineChartData[0]['data'], getSeriesColor(theme)[1]);
+    this.getAnnotaiton(this.lineChartData[0]['data'].filter(x => x != 0), getSeriesColor(theme)[1]);
     this.displayLineGraph = true;
     this.audioCtx.close();
     cancelAnimationFrame(this.drawVisual);
@@ -202,9 +223,9 @@ export class AppComponent {
       this.createDownloadLink(blob);
     });
 
-    console.log('1: ', this.audioBufferArray);
-    console.log('2: ', new Uint8Array(this.audioBufferArray));
-    console.log('Record RTC: ', this.recordRTC);
+    // console.log('1: ', this.audioBufferArray);
+    // console.log('2: ', new Uint8Array(this.audioBufferArray));
+    // console.log('Record RTC: ', this.recordRTC);
     // this.createDownloadLink(new Uint8Array(this.audioBufferArray));
   }
 
@@ -405,15 +426,11 @@ export class AppComponent {
     let data = [];
     if (this.hideZeroes) {
       for (let i = 1; i < this.pitchDataPoints.length; i++) {
-        // visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
         if (this.pitchDataPoints[i] != 0)
-          // data.push({ date: new Date(2018, 0, i), name: "name" + i, value: this.pitchDataPoints[i] });
           data.push({ category: i, value: this.pitchDataPoints[i] });
       }
     } else {
       for (let i = 1; i < this.pitchDataPoints.length; i++) {
-        // visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-        // data.push({ date: new Date(2018, 0, i), name: "name" + i, value: this.pitchDataPoints[i] });
         data.push({ category: i, value: this.pitchDataPoints[i] });
       }
     }
@@ -454,7 +471,6 @@ export class AppComponent {
     if (this.hideZeroes) {
       this.pitchShowHideText = 'Show zeroes';
       this.lineChartData[0]['data'] = this.lineChartData[0]['data'].filter(x => x != 0);
-
     } else {
       this.pitchShowHideText = 'Hide zeroes';
       this.lineChartData[0]['data'] = this.pitchDataPoints;
@@ -625,27 +641,38 @@ export class AppComponent {
     console.log('fifififi: ', this.rollingAverageDataSource);
   }
 
-  changeStartingPoint($event) {
-    this.startingPointEntered = true;
-    console.log('Starting point: ', $event.target.value);
+  changeIncrementSize($event) {
+    this.incrementSizeEntered = true;
     if (parseInt($event.target.value) > 0) {
-      this.startingPoint = parseInt($event.target.value);
-      this.rangeValue = [this.startingPoint, this.rangeValue[1]];
+      this.incrementSize = parseInt($event.target.value);
+      // this.startingPoint = parseInt($event.target.value);
+      // this.rangeValue = [this.startingPoint, this.rangeValue[1]];
     } else {
-      this.startingPoint = 1;
+      this.incrementSize = 1;
     }
-    this.rangeFrom = this.startingPoint;
-    // this.Chart.dataBind();
   }
+
+  // changeStartingPoint($event) {
+  //   this.incrementSizeEntered = true;
+  //   console.log('Starting point: ', $event.target.value);
+  //   if (parseInt($event.target.value) > 0) {
+  //     this.startingPoint = parseInt($event.target.value);
+  //     this.rangeValue = [this.startingPoint, this.rangeValue[1]];
+  //   } else {
+  //     this.startingPoint = 1;
+  //   }
+  //   this.rangeFrom = this.startingPoint;
+  //   // this.Chart.dataBind();
+  // }
 
   changeRangeSize($event) {
     if (parseInt($event.target.value) > 0) {
       this.rangeSize = parseInt($event.target.value);
-      this.rangeValue = [this.rangeFrom, this.rangeFrom + this.rangeSize];
+      this.rangeValue = [this.startingPoint, this.startingPoint + this.rangeSize];
     } else {
       this.rangeSize = 0;
     }
-    this.rangeFrom = this.rangeFrom + this.rangeSize;
+    // this.rangeFrom = this.rangeFrom + this.rangeSize;
 
     // this.calculateRollingAverage();
   }
@@ -653,8 +680,9 @@ export class AppComponent {
   calculateRollingAverage() {
     this.rollingAveragePitchDataPoints = [];
     console.log('asdasd: ', this.dataSource);
+    console.log('123123: ', Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize);
     // let z = 0;
-    for (let i = this.startingPoint; i <= Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.rangeSize) {
+    for (let i = this.startingPoint; i <= Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.incrementSize) {
       let sum = 0;
       console.log('i: ', i);
       // z = i;
