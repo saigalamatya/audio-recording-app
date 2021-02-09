@@ -6,7 +6,7 @@
     <button type="button" class="btn btn-danger" (click)="stopRecording()">Stop</button>
   </div>
   <div class="row">
-    <canvas class="visualizer" width="640" height="100" #myCanvas></canvas>
+    <canvas class="visualizer ml-3" width="640" height="100" #myCanvas></canvas>
   </div>
 
   <div class="row">
@@ -33,8 +33,26 @@
   <!-- <div id="chartdiv" style="width: 100%; height: 500px"></div> -->
 
   <div class="control-section" *ngIf="recordCompleted">
-    Average pitch of selected range: {{rangeAverage}} Hz
-    <button type="button" class="btn btn-success" (click)="addToRollingAverage()">Add to Rolling Average</button>
+    <!-- <div class="row">
+      Average pitch of selected range: {{rangeAverage}} Hz
+      <button type="button" class="btn btn-success" (click)="addToRollingAverage()">Add to Rolling Average</button>
+      <input type="number" class="form-control col-sm-3" name="rangeSize" [(ngModel)]="rangeSize"
+        placeholder="Enter range size" (change)="changeRangeSize($event)">
+    </div> -->
+    <form>
+      <div class="form-group row">
+        <label for="startingPoint" class="col-sm-2 col-form-label">Starting Point:</label>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="startingPoint" placeholder="Enter starting point...">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="range" class="col-sm-2 col-form-label">Range: </label>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" name="range" placeholder="Enter range...">
+        </div>
+      </div>
+    </form>
     <div class="row" align="center">
       <div align="center">
         <ejs-rangenavigator style='display:block' align='center' id='containerDouble' [value]='rangeValue'
@@ -48,7 +66,7 @@
       </div>
       <div align="center">
         <ejs-chart #chartDouble style='display:block;' id='chartDouble' align='center' [chartArea]='chartArea'
-          [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis' height='400' [theme]='theme'
+          [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis' height='350' [theme]='theme'
           [tooltip]='tooltip' [annotations]='annotations' [legendSettings]='legendSettings' (loaded)='loaded($event)'
           (axisLabelRender)='axisLabelRender($event)'>
           <e-series-collection>
@@ -65,7 +83,7 @@
       <div align="center">
         <ejs-chart #rollingAverageChart style='display:block;' id='rollingAverageChart' align='center'
           [chartArea]='chartArea' [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis'
-          height='400' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations' (loaded)='loaded($event)'
+          height='350' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations' (loaded)='loaded($event)'
           (axisLabelRender)='axisLabelRender($event)'>
           <e-series-collection>
             <e-series [dataSource]='rollingAverageDataSource' name='Value' type='Spline' xName='x' yName='y' width='2'

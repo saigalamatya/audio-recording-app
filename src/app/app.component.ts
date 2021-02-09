@@ -112,7 +112,8 @@ export class AppComponent {
   rollingAverageDataSource: Object[];
   rollingAveragePitchDataPoints = [];
   rangeAverage = 0;
-
+  rangeSize = 0;
+  rangeFrom = 0;
 
   constructor(
     private elementRef: ElementRef,
@@ -496,7 +497,7 @@ export class AppComponent {
     )
   );
 
-  public rangeValue: Object = [];
+  public rangeValue = [];
   public annotations: Object = chartAnnotation;
   public marker: Object = {
     visible: true,
@@ -609,15 +610,19 @@ export class AppComponent {
 
   addToRollingAverage() {
     let index = this.rollingAveragePitchDataPoints.findIndex(x => x == this.rangeAverage);
-    if (index > -1) {
-      if (window.confirm(`The pitch is already in the list. Are you sure you want to add it again?`)) {
+    if (!Number.isNaN(this.rangeAverage)) {
+      if (index > -1) {
+        if (window.confirm(`The pitch is already in the list. Are you sure you want to add it again?`)) {
+          this.rollingAveragePitchDataPoints.push(this.rangeAverage);
+        }
+      } else {
         this.rollingAveragePitchDataPoints.push(this.rangeAverage);
+        this.rangeValue = [this.rangeFrom, this.rangeFrom + this.rangeSize];
+        this.rangeFrom = this.rangeFrom + this.rangeSize;
       }
-    } else {
-      this.rollingAveragePitchDataPoints.push(this.rangeAverage);
+      console.log('Rolling average data [points]: ', this.rollingAveragePitchDataPoints);
+      this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
     }
-    console.log('Rolling average data [points]: ', this.rollingAveragePitchDataPoints);
-    this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
   }
 
   generateRollingAveragePitchChart(args) {
@@ -651,6 +656,16 @@ export class AppComponent {
     }
     this.rollingAverageDataSource = args;
     console.log('fifififf: ', this.rollingAverageDataSource);
+  }
+
+  changeRangeSize($event) {
+    if (parseInt($event.target.value) > 0) {
+      this.rangeSize = parseInt($event.target.value);
+      this.rangeValue = [this.rangeFrom, this.rangeFrom + this.rangeSize];
+      this.rangeFrom = this.rangeFrom + this.rangeSize;
+    } else {
+      this.rangeSize = 0;
+    }
   }
 
 }
