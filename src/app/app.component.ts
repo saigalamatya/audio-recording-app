@@ -114,10 +114,11 @@ export class AppComponent {
   rollingAverageDataSource: Object[];
   rollingAveragePitchDataPoints = [];
   startingPoint = 0;
+  incrementSize = 0;
   rangeAverage = 0;
   rangeSize = 0;
   rangeFrom = 0;
-  startingPointEntered = false;
+  incrementSizeEntered = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -138,7 +139,7 @@ export class AppComponent {
     this.rangeAverage = 0;
     this.rangeSize = 0;
     this.rangeFrom = 0;
-    this.startingPointEntered = false;
+    this.incrementSizeEntered = false;
 
     if (!this.isRecording) {
       if (this.au && this.li && this.link) {
@@ -644,27 +645,38 @@ export class AppComponent {
     console.log('fifififi: ', this.rollingAverageDataSource);
   }
 
-  changeStartingPoint($event) {
-    this.startingPointEntered = true;
-    console.log('Starting point: ', $event.target.value);
+  changeIncrementSize($event) {
+    this.incrementSizeEntered = true;
     if (parseInt($event.target.value) > 0) {
-      this.startingPoint = parseInt($event.target.value);
-      this.rangeValue = [this.startingPoint, this.rangeValue[1]];
+      this.incrementSize = parseInt($event.target.value);
+      // this.startingPoint = parseInt($event.target.value);
+      // this.rangeValue = [this.startingPoint, this.rangeValue[1]];
     } else {
-      this.startingPoint = 1;
+      this.incrementSize = 1;
     }
-    this.rangeFrom = this.startingPoint;
-    // this.Chart.dataBind();
   }
+
+  // changeStartingPoint($event) {
+  //   this.incrementSizeEntered = true;
+  //   console.log('Starting point: ', $event.target.value);
+  //   if (parseInt($event.target.value) > 0) {
+  //     this.startingPoint = parseInt($event.target.value);
+  //     this.rangeValue = [this.startingPoint, this.rangeValue[1]];
+  //   } else {
+  //     this.startingPoint = 1;
+  //   }
+  //   this.rangeFrom = this.startingPoint;
+  //   // this.Chart.dataBind();
+  // }
 
   changeRangeSize($event) {
     if (parseInt($event.target.value) > 0) {
       this.rangeSize = parseInt($event.target.value);
-      this.rangeValue = [this.rangeFrom, this.rangeFrom + this.rangeSize];
+      this.rangeValue = [this.startingPoint, this.startingPoint + this.rangeSize];
     } else {
       this.rangeSize = 0;
     }
-    this.rangeFrom = this.rangeFrom + this.rangeSize;
+    // this.rangeFrom = this.rangeFrom + this.rangeSize;
 
     // this.calculateRollingAverage();
   }
@@ -672,8 +684,9 @@ export class AppComponent {
   calculateRollingAverage() {
     this.rollingAveragePitchDataPoints = [];
     console.log('asdasd: ', this.dataSource);
+    console.log('123123: ', Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize);
     // let z = 0;
-    for (let i = this.startingPoint; i <= Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.rangeSize) {
+    for (let i = this.startingPoint; i <= Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.incrementSize) {
       let sum = 0;
       console.log('i: ', i);
       // z = i;

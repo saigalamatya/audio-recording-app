@@ -48,18 +48,18 @@
     </div> -->
     <form>
       <div class="form-group row">
-        <label for="startingPoint" class="col-sm-2 col-form-label">Starting Point:</label>
+        <label for="startingPoint" class="col-sm-2 col-form-label">Increment size:</label>
         <div class="col-sm-3">
-          <input type="text" class="form-control" name="startingPoint" [(ngModel)]="startingPoint"
-            (change)="changeStartingPoint($event)" placeholder="Enter starting point..." tabindex="1">
+          <input type="text" class="form-control" name="startingPoint" [(ngModel)]="incrementSize"
+            (change)="changeIncrementSize($event)" placeholder="Enter increment size..." tabindex="1">
         </div>
       </div>
       <div class="form-group row">
         <label for="range" class="col-sm-2 col-form-label">Range: </label>
         <div class="col-sm-3">
           <input type="text" class="form-control" name="range" [(ngModel)]="rangeSize"
-            (change)="changeRangeSize($event)" placeholder="Enter range..." [readonly]="!startingPointEntered"
-            [title]="!startingPointEntered ? 'Please enter starting point before entering range.': ''" tabindex="2">
+            (change)="changeRangeSize($event)" placeholder="Enter range..." [readonly]="!incrementSizeEntered"
+            [title]="!incrementSizeEntered ? 'Please enter starting point before entering range.': ''" tabindex="2">
         </div>
       </div>
 
