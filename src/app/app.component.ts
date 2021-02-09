@@ -23,6 +23,7 @@ import {
   RangeTooltip,
   IAxisLabelRenderEventArgs
 } from "@syncfusion/ej2-charts";
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 
 // ej2-chart
 /**
@@ -120,7 +121,8 @@ export class AppComponent {
 
   constructor(
     private elementRef: ElementRef,
-    private _renderer: Renderer2
+    private _renderer: Renderer2,
+    private _ngxUiLoaderService: NgxUiLoaderService
   ) {
   }
 
@@ -200,6 +202,7 @@ export class AppComponent {
   }
 
   stopRecording() {
+    // this._ngxUiLoaderService.start();
     this.recordCompleted = true;
     this.isRecording = false;
 
@@ -218,9 +221,9 @@ export class AppComponent {
       this.createDownloadLink(blob);
     });
 
-    console.log('1: ', this.audioBufferArray);
-    console.log('2: ', new Uint8Array(this.audioBufferArray));
-    console.log('Record RTC: ', this.recordRTC);
+    // console.log('1: ', this.audioBufferArray);
+    // console.log('2: ', new Uint8Array(this.audioBufferArray));
+    // console.log('Record RTC: ', this.recordRTC);
     // this.createDownloadLink(new Uint8Array(this.audioBufferArray));
   }
 

@@ -111,3 +111,17 @@
     </div>
   </div>
 </div>
+
+<div style="position: relative">
+  <!-- the position of the parent container must be set to relative -->
+  <!-- It is really important to set loaderId for non-master loader -->
+  <ngx-ui-loader [loaderId]="'loader-01'"></ngx-ui-loader>
+</div>
+
+<div style="position: relative">
+  <!-- the position of the parent container must be set to relative -->
+  <!-- It is really important to set loaderId for non-master loader -->
+  <ngx-ui-loader [loaderId]="'loader-02'"></ngx-ui-loader>
+</div>
+
+<ngx-ui-loader [text]="'Generating chart ...'"></ngx-ui-loader>

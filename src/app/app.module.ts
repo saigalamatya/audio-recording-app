@@ -8,6 +8,7 @@ import { GridAllModule } from '@syncfusion/ej2-angular-grids';
 import { ButtonAllModule, SwitchAllModule } from '@syncfusion/ej2-angular-buttons';
 import { ChartAllModule, RangeNavigatorAllModule } from '@syncfusion/ej2-angular-charts';
 import { FormsModule } from '@angular/forms';
+import { NgxUiLoaderModule } from 'ngx-ui-loader';
 @NgModule({
   declarations: [
     AppComponent
@@ -18,6 +19,7 @@ import { FormsModule } from '@angular/forms';
     GridAllModule,
     ButtonAllModule,
     SwitchAllModule,
+    NgxUiLoaderModule,
     FormsModule,
     BrowserModule,
     BrowserAnimationsModule
