@@ -132,6 +132,11 @@ export class AppComponent {
 
   startRecording() {
     this.recordCompleted = false;
+    this.startingPoint = 0;
+    this.rangeAverage = 0;
+    this.rangeSize = 0;
+    this.rangeFrom = 0;
+    this.startingPointEntered = false;
 
     if (!this.isRecording) {
       if (this.au && this.li && this.link) {
@@ -167,11 +172,22 @@ export class AppComponent {
 
             var options = {
               type: 'audio',
-              mimeType: 'audio/wav'
+              mimeType: 'audio/wav',
+
             };
 
             this.recordRTC = RecordRTC(stream, options);
             this.recordRTC.startRecording();
+
+            let timer = 0;
+            var timerId = setInterval(() => {
+              if (timer > 10) {
+                this.stopRecording();
+                clearInterval(timerId);
+              } else {
+                timer = timer + 1;
+              }
+            }, 1000);
 
             //start the recording process 
             console.log("Recording started", this.recordRTC);

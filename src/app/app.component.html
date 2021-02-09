@@ -30,6 +30,13 @@
     </div>
   </div>
 
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>Welcome!</strong> For the time being the recording length is set to 10 seconds max.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
   <!-- <div id="chartdiv" style="width: 100%; height: 500px"></div> -->
 
   <div class="control-section" *ngIf="recordCompleted">
@@ -56,7 +63,8 @@
         </div>
       </div>
 
-      <button *ngIf="rangeSize" type="button" class="btn btn-primary" (click)="calculateRollingAverage()">Add to Rolling
+      <button *ngIf="rangeSize" type="button" class="btn btn-primary" (click)="calculateRollingAverage()">Generate
+        Rolling
         Average</button>
     </form>
     <label>Pitch Chart</label>
