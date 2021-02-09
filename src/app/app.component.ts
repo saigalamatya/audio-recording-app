@@ -104,8 +104,8 @@ export class AppComponent {
   valueAxis;
   scrollbarX;
 
-  hideZeroes = false;
-  pitchShowHideText = 'Hide zeroes';
+  hideZeroes = true;
+  pitchShowHideText = 'Show zeroes';
   pitchDataPoints = [];
   recordCompleted = false;
   isRecording = false;
@@ -182,15 +182,15 @@ export class AppComponent {
             this.recordRTC = RecordRTC(stream, options);
             this.recordRTC.startRecording();
 
-            let timer = 0;
-            var timerId = setInterval(() => {
-              if (timer > 10) {
-                this.stopRecording();
-                clearInterval(timerId);
-              } else {
-                timer = timer + 1;
-              }
-            }, 1000);
+            // let timer = 0;
+            // var timerId = setInterval(() => {
+            //   if (timer > 10) {
+            //     this.stopRecording();
+            //     clearInterval(timerId);
+            //   } else {
+            //     timer = timer + 1;
+            //   }
+            // }, 1000);
 
             //start the recording process 
             console.log("Recording started", this.recordRTC);
@@ -210,9 +210,10 @@ export class AppComponent {
     this.streamData.getTracks().forEach(function (track) {
       track.stop();
     });
+
     this.pitchDataPoints = this.lineChartData[0]['data'];
     this.generateChartData();
-    this.getAnnotaiton(this.lineChartData[0]['data'], getSeriesColor(theme)[1]);
+    this.getAnnotaiton(this.lineChartData[0]['data'].filter(x => x != 0), getSeriesColor(theme)[1]);
     this.displayLineGraph = true;
     this.audioCtx.close();
     cancelAnimationFrame(this.drawVisual);
@@ -425,15 +426,11 @@ export class AppComponent {
     let data = [];
     if (this.hideZeroes) {
       for (let i = 1; i < this.pitchDataPoints.length; i++) {
-        // visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
         if (this.pitchDataPoints[i] != 0)
-          // data.push({ date: new Date(2018, 0, i), name: "name" + i, value: this.pitchDataPoints[i] });
           data.push({ category: i, value: this.pitchDataPoints[i] });
       }
     } else {
       for (let i = 1; i < this.pitchDataPoints.length; i++) {
-        // visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-        // data.push({ date: new Date(2018, 0, i), name: "name" + i, value: this.pitchDataPoints[i] });
         data.push({ category: i, value: this.pitchDataPoints[i] });
       }
     }
@@ -474,7 +471,6 @@ export class AppComponent {
     if (this.hideZeroes) {
       this.pitchShowHideText = 'Show zeroes';
       this.lineChartData[0]['data'] = this.lineChartData[0]['data'].filter(x => x != 0);
-
     } else {
       this.pitchShowHideText = 'Hide zeroes';
       this.lineChartData[0]['data'] = this.pitchDataPoints;
