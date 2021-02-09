@@ -44,19 +44,25 @@
         <label for="startingPoint" class="col-sm-2 col-form-label">Starting Point:</label>
         <div class="col-sm-3">
           <input type="text" class="form-control" name="startingPoint" [(ngModel)]="startingPoint"
-            (change)="changeStartingPoint($event)" placeholder="Enter starting point...">
+            (change)="changeStartingPoint($event)" placeholder="Enter starting point..." tabindex="1">
         </div>
       </div>
       <div class="form-group row">
         <label for="range" class="col-sm-2 col-form-label">Range: </label>
         <div class="col-sm-3">
           <input type="text" class="form-control" name="range" [(ngModel)]="rangeSize"
-            (change)="changeRangeSize($event)" placeholder="Enter range...">
+            (change)="changeRangeSize($event)" placeholder="Enter range..." [readonly]="!startingPointEntered"
+            [title]="!startingPointEntered ? 'Please enter starting point before entering range.': ''" tabindex="2">
         </div>
       </div>
+
+      <button *ngIf="rangeSize" type="button" class="btn btn-primary" (click)="calculateRollingAverage()">Add to Rolling
+        Average</button>
     </form>
+    <label>Pitch Chart</label>
+    <br />
     <div class="row" align="center">
-      <div align="center">
+      <!-- <div align="center">
         <ejs-rangenavigator style='display:block' align='center' id='containerDouble' [value]='rangeValue'
           labelPosition='Outside' [width]='width' (changed)='changed($event)' [theme]='theme' [tooltip]='tooltip'
           (tooltipRender)='tooltipRender($event)' (load)='load($event)'>
@@ -65,14 +71,14 @@
             </e-rangenavigator-series>
           </e-rangenavigator-series-collection>
         </ejs-rangenavigator>
-      </div>
+      </div> -->
       <div align="center">
         <ejs-chart #chartDouble style='display:block;' id='chartDouble' align='center' [chartArea]='chartArea'
           [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis' height='350' [theme]='theme'
           [tooltip]='tooltip' [annotations]='annotations' [legendSettings]='legendSettings'
           (axisLabelRender)='axisLabelRender($event)'>
           <e-series-collection>
-            <e-series [dataSource]='dataSource' name='Value' type='Spline' xName='x' yName='y' width='2'
+            <e-series [dataSource]='dataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'
               [marker]="marker" [animation]='animation'>
             </e-series>
           </e-series-collection>
@@ -88,7 +94,7 @@
           height='350' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations'
           (axisLabelRender)='axisLabelRender($event)'>
           <e-series-collection>
-            <e-series [dataSource]='rollingAverageDataSource' name='Value' type='Spline' xName='x' yName='y' width='2'
+            <e-series [dataSource]='rollingAverageDataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'
               [marker]="marker" [animation]='animation'>
             </e-series>
           </e-series-collection>

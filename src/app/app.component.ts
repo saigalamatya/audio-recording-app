@@ -116,6 +116,7 @@ export class AppComponent {
   rangeAverage = 0;
   rangeSize = 0;
   rangeFrom = 0;
+  startingPointEntered = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -625,13 +626,15 @@ export class AppComponent {
   }
 
   changeStartingPoint($event) {
+    this.startingPointEntered = true;
     console.log('Starting point: ', $event.target.value);
     if (parseInt($event.target.value) > 0) {
       this.startingPoint = parseInt($event.target.value);
+      this.rangeValue = [this.startingPoint, this.rangeValue[1]];
     } else {
       this.startingPoint = 1;
     }
-    this.rangeValue[0] = this.startingPoint;
+    this.rangeFrom = this.startingPoint;
     // this.Chart.dataBind();
   }
 
@@ -639,9 +642,33 @@ export class AppComponent {
     if (parseInt($event.target.value) > 0) {
       this.rangeSize = parseInt($event.target.value);
       this.rangeValue = [this.rangeFrom, this.rangeFrom + this.rangeSize];
-      this.rangeFrom = this.rangeFrom + this.rangeSize;
     } else {
       this.rangeSize = 0;
+    }
+    this.rangeFrom = this.rangeFrom + this.rangeSize;
+
+    // this.calculateRollingAverage();
+  }
+
+  calculateRollingAverage() {
+    this.rollingAveragePitchDataPoints = [];
+    console.log('asdasd: ', this.dataSource);
+    // let z = 0;
+    for (let i = this.startingPoint; i <= Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.rangeSize) {
+      let sum = 0;
+      console.log('i: ', i);
+      // z = i;
+      // console.log('Range Average::::::::::::::::', this.rangeAverage);
+      //       this.rangeAverage = Math.round((sum / args.selectedData.length + Number.EPSILON) * 100) / 100;
+      // console.log('Average pitch: ', this.rangeAverage);
+      for (let j = i; j <= i + this.rangeSize; j++) {
+        sum += this.dataSource[j]['y'];
+      }
+      // this.rangeAverage = sum / this.rangeSize;
+      this.rangeAverage = Math.round((sum / this.rangeSize + Number.EPSILON) * 100) / 100;
+      console.log('Average pitch: ', this.rangeAverage);
+      this.rollingAveragePitchDataPoints.push(this.rangeAverage);
+      this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
     }
   }
 
