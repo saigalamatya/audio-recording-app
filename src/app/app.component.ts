@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, NgZone, PLATFORM_ID, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import * as WaveSurfer from 'wavesurfer.js';
 import * as RecordRTC from 'recordrtc';
 
@@ -107,18 +107,19 @@ export class AppComponent {
   pitchShowHideText = 'Hide zeroes';
   pitchDataPoints = [];
   recordCompleted = false;
+  isRecording = false;
 
   // for rolling average of pitch
   rollingAverageDataSource: Object[];
   rollingAveragePitchDataPoints = [];
+  startingPoint = 0;
   rangeAverage = 0;
   rangeSize = 0;
   rangeFrom = 0;
 
   constructor(
     private elementRef: ElementRef,
-    private _renderer: Renderer2,
-    @Inject(PLATFORM_ID) private platformId, private zone: NgZone
+    private _renderer: Renderer2
   ) {
   }
 
@@ -131,54 +132,59 @@ export class AppComponent {
   startRecording() {
     this.recordCompleted = false;
 
-    if (this.au && this.li && this.link) {
-      this.url = null;
-      this._renderer.removeChild(this.elementRef.nativeElement, this.au);
-      this._renderer.removeChild(this.elementRef.nativeElement, this.li);
-      this._renderer.removeChild(this.elementRef.nativeElement, this.link);
+    if (!this.isRecording) {
+      if (this.au && this.li && this.link) {
+        this.url = null;
+        this._renderer.removeChild(this.elementRef.nativeElement, this.au);
+        this._renderer.removeChild(this.elementRef.nativeElement, this.li);
+        this._renderer.removeChild(this.elementRef.nativeElement, this.link);
+      }
+
+      if (this.wavesurfer) {
+        this.wavesurfer.destroy();
+      }
+      this.audioCtx = new AudioContext();
+
+      this.analyser = this.audioCtx.createAnalyser();
+      this.distortion = this.audioCtx.createWaveShaper();
+      this.gainNode = this.audioCtx.createGain();
+      this.biquadFilter = this.audioCtx.createBiquadFilter();
+      this.convolver = this.audioCtx.createConvolver();
+
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(
+          (stream) => {
+            this.streamData = stream;
+            this.isRecording = true;
+            this.source = this.audioCtx.createMediaStreamSource(stream);
+            this.source.connect(this.distortion);
+            this.distortion.connect(this.biquadFilter);
+            this.biquadFilter.connect(this.gainNode);
+            this.convolver.connect(this.gainNode);
+            this.gainNode.connect(this.analyser);
+            this.analyser.connect(this.audioCtx.destination);
+
+            var options = {
+              type: 'audio',
+              mimeType: 'audio/wav'
+            };
+
+            this.recordRTC = RecordRTC(stream, options);
+            this.recordRTC.startRecording();
+
+            //start the recording process 
+            console.log("Recording started", this.recordRTC);
+
+            this.visualize();
+          }
+        )
     }
 
-    if (this.wavesurfer) {
-      this.wavesurfer.destroy();
-    }
-    this.audioCtx = new AudioContext();
-
-    this.analyser = this.audioCtx.createAnalyser();
-    this.distortion = this.audioCtx.createWaveShaper();
-    this.gainNode = this.audioCtx.createGain();
-    this.biquadFilter = this.audioCtx.createBiquadFilter();
-    this.convolver = this.audioCtx.createConvolver();
-
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(
-        (stream) => {
-          this.streamData = stream;
-          this.source = this.audioCtx.createMediaStreamSource(stream);
-          this.source.connect(this.distortion);
-          this.distortion.connect(this.biquadFilter);
-          this.biquadFilter.connect(this.gainNode);
-          this.convolver.connect(this.gainNode);
-          this.gainNode.connect(this.analyser);
-          this.analyser.connect(this.audioCtx.destination);
-
-          var options = {
-            type: 'audio',
-            mimeType: 'audio/wav'
-          };
-
-          this.recordRTC = RecordRTC(stream, options);
-          this.recordRTC.startRecording();
-
-          //start the recording process 
-          console.log("Recording started", this.recordRTC);
-
-          this.visualize();
-        }
-      )
   }
 
   stopRecording() {
     this.recordCompleted = true;
+    this.isRecording = false;
 
     this.streamData.getTracks().forEach(function (track) {
       track.stop();
@@ -518,8 +524,6 @@ export class AppComponent {
     });
     console.log('args:ASDasd', args)
     for (let i: number = 0; i < args.length; i++) {
-      /* tslint:disable:no-string-literal */
-      // if (args[i]["isWicket"]) {
       chartAnnotation.push({
         // content:
         //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
@@ -530,13 +534,10 @@ export class AppComponent {
         //   "; color:" +
         //   color +
         //   '">W</div>',
-        /* tslint:disable:no-string-literal */
         x: args[i]["x"],
-        /* tslint:disable:no-string-literal */
         y: args[i]["y"],
         coordinateUnits: "Point"
       });
-      // }
     }
     this.rangeValue = [args[0]['x'], args[args.length - 1]['x']];
     this.dataSource = args;
@@ -549,37 +550,6 @@ export class AppComponent {
       let value: number = Math.abs(Number(args.text));
       args.text = String(value);
     }
-  }
-
-  public loaded(args: ILoadedEventArgs): void {
-    // let series1: string = args.chart.visibleSeries[0].interior;
-    // let series2: string = args.chart.visibleSeries[1].interior;
-    // // let html: string = "<table></table>";
-    // // html +=
-    // //   '<tr><td><div style="width:10px; height: 10px; border: 2px solid ' +
-    // //   series1 +
-    // //   "; background: " +
-    // //   series1 +
-    // //   ';"></div></td><td style="padding-left:10px;">' +
-    // //   " Australia" +
-    // //   "</td>";
-    // // html +=
-    // //   '<tr><td><div style="width:10px; height: 10px; border: 2px solid ' +
-    // //   series2 +
-    // //   "; background: " +
-    // //   series2 +
-    // //   ';"></div></td><td style="padding-left:10px;">' +
-    // //   " Sri Lanka" +
-    // //   "</td>";
-    // // html += "</table>";
-    // this.Chart.setAnnotationValue(
-    //   0,
-    //   '<div id="exchangeRate" style="line-height: 18px;' +
-    //   "font-size: 13px;background: #fff; opacity:0.9; color: #464e56; " +
-    //   " box-shadow:0 0 8px 0 rgba(70,78,86,.25); padding: 7px 10px;" +
-    //   'border-radius: 3px">' +
-    //   "</div>"
-    // );
   }
 
   public tooltipRender(args: IRangeTooltipRenderEventArgs): void {
@@ -635,8 +605,6 @@ export class AppComponent {
     });
     console.log('Rolling average data points source: ', args)
     for (let i: number = 0; i < args.length; i++) {
-      /* tslint:disable:no-string-literal */
-      // if (args[i]["isWicket"]) {
       chartAnnotation.push({
         // content:
         //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
@@ -647,15 +615,24 @@ export class AppComponent {
         //   "; color:" +
         //   color +
         //   '">W</div>',
-        /* tslint:disable:no-string-literal */
         x: args[i]["x"],
-        /* tslint:disable:no-string-literal */
         y: args[i]["y"],
         coordinateUnits: "Point"
       });
     }
     this.rollingAverageDataSource = args;
-    console.log('fifififf: ', this.rollingAverageDataSource);
+    console.log('fifififi: ', this.rollingAverageDataSource);
+  }
+
+  changeStartingPoint($event) {
+    console.log('Starting point: ', $event.target.value);
+    if (parseInt($event.target.value) > 0) {
+      this.startingPoint = parseInt($event.target.value);
+    } else {
+      this.startingPoint = 1;
+    }
+    this.rangeValue[0] = this.startingPoint;
+    // this.Chart.dataBind();
   }
 
   changeRangeSize($event) {

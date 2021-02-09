@@ -2,8 +2,8 @@
 
   <!-- <div class="wrapper" #wrapper> -->
   <div class="btn-group mt-2 mb-2">
-    <button type="button" class="btn btn-primary" (click)="startRecording()">Record</button>&nbsp;
-    <button type="button" class="btn btn-danger" (click)="stopRecording()">Stop</button>
+    <button *ngIf="!isRecording" type="button" class="btn btn-primary" (click)="startRecording()">Record</button>&nbsp;
+    <button *ngIf="isRecording" type="button" class="btn btn-danger" (click)="stopRecording()">Stop</button>
   </div>
   <div class="row">
     <canvas class="visualizer ml-3" width="640" height="100" #myCanvas></canvas>
@@ -43,13 +43,15 @@
       <div class="form-group row">
         <label for="startingPoint" class="col-sm-2 col-form-label">Starting Point:</label>
         <div class="col-sm-3">
-          <input type="text" class="form-control" name="startingPoint" placeholder="Enter starting point...">
+          <input type="text" class="form-control" name="startingPoint" [(ngModel)]="startingPoint"
+            (change)="changeStartingPoint($event)" placeholder="Enter starting point...">
         </div>
       </div>
       <div class="form-group row">
         <label for="range" class="col-sm-2 col-form-label">Range: </label>
         <div class="col-sm-3">
-          <input type="text" class="form-control" name="range" placeholder="Enter range...">
+          <input type="text" class="form-control" name="range" [(ngModel)]="rangeSize"
+            (change)="changeRangeSize($event)" placeholder="Enter range...">
         </div>
       </div>
     </form>
@@ -67,7 +69,7 @@
       <div align="center">
         <ejs-chart #chartDouble style='display:block;' id='chartDouble' align='center' [chartArea]='chartArea'
           [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis' height='350' [theme]='theme'
-          [tooltip]='tooltip' [annotations]='annotations' [legendSettings]='legendSettings' (loaded)='loaded($event)'
+          [tooltip]='tooltip' [annotations]='annotations' [legendSettings]='legendSettings'
           (axisLabelRender)='axisLabelRender($event)'>
           <e-series-collection>
             <e-series [dataSource]='dataSource' name='Value' type='Spline' xName='x' yName='y' width='2'
@@ -83,7 +85,7 @@
       <div align="center">
         <ejs-chart #rollingAverageChart style='display:block;' id='rollingAverageChart' align='center'
           [chartArea]='chartArea' [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis'
-          height='350' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations' (loaded)='loaded($event)'
+          height='350' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations'
           (axisLabelRender)='axisLabelRender($event)'>
           <e-series-collection>
             <e-series [dataSource]='rollingAverageDataSource' name='Value' type='Spline' xName='x' yName='y' width='2'
