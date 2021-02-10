@@ -122,7 +122,7 @@ export class AppComponent {
 
   // for amplitude
   amplitudeDataSource = [];
-  amplitudeDataSourceRangeValue = [];
+  amplitudeRangeValue = [];
 
   constructor(
     private elementRef: ElementRef,
@@ -218,6 +218,7 @@ export class AppComponent {
     this.pitchDataPoints = this.lineChartData[0]['data'];
     this.generateChartData();
     this.getAnnotaiton(this.lineChartData[0]['data'].filter(x => x != 0), getSeriesColor(theme)[1]);
+    this.generateAmplitudeChart(this.audioBufferArray);
     this.displayLineGraph = true;
     this.audioCtx.close();
     cancelAnimationFrame(this.drawVisual);
@@ -715,6 +716,31 @@ export class AppComponent {
   // for amplitude
   generateAmplitudeChart(array) {
     console.log('Amplitude array: ', array);
+    array = array.map((data, i) => {
+      return {
+        x: i + 1,
+        y: data
+      }
+    });
+    console.log('args:ASDasd', array)
+    for (let i: number = 0; i < array.length; i++) {
+      chartAnnotation.push({
+        // content:
+        //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
+        //   "background: " +
+        //   backgroundColor +
+        //   "; border: 2px solid " +
+        //   color +
+        //   "; color:" +
+        //   color +
+        //   '">W</div>',
+        x: array[i]["x"],
+        y: array[i]["y"],
+        coordinateUnits: "Point"
+      });
+    }
+    this.amplitudeRangeValue = [array[0]['x'], array[array.length - 1]['x']];
+    this.amplitudeDataSource = array;
   }
 
 }
