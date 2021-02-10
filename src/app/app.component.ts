@@ -120,6 +120,10 @@ export class AppComponent {
   rangeFrom = 0;
   incrementSizeEntered = false;
 
+  // for amplitude
+  amplitudeDataSource = [];
+  amplitudeDataSourceRangeValue = [];
+
   constructor(
     private elementRef: ElementRef,
     private _renderer: Renderer2,
@@ -292,13 +296,19 @@ export class AppComponent {
     this.canvasCtx.clearRect(0, 0, 500, 100);
 
     var drawAlt = () => {
-      console.log("data array: ", dataArray);
+      // console.log("data array: ", dataArray);
+      console.log("freq domain: ", freqDomain);
 
       console.log('Analyser: ', this.analyser);
 
-      this.audioBufferData.push(Object.assign({ time: this.audioCtx.currentTime, data: dataArray }));
-      // audioBufferArray = audioBufferArray.concat([...dataArray]);
-      dataArray.forEach(x => {
+      // this.audioBufferData.push(Object.assign({ time: this.audioCtx.currentTime, data: dataArray }));
+      // // audioBufferArray = audioBufferArray.concat([...dataArray]);
+      // dataArray.forEach(x => {
+      //   this.audioBufferArray.push(x);
+      // });
+
+      this.audioBufferData.push(Object.assign({ time: this.audioCtx.currentTime, data: freqDomain }));
+      freqDomain.forEach(x => {
         this.audioBufferArray.push(x);
       });
 
@@ -306,8 +316,10 @@ export class AppComponent {
       console.log('Audio Buffer array: ', this.audioBufferArray);
 
       // getByteFrequencyData() -> copies current frequency data into unassigned byte array passed into it
-      this.analyser.getByteFrequencyData(dataArray);
-      this.analyser.getByteTimeDomainData(dataArray);
+      // this.analyser.getByteFrequencyData(dataArray);
+      // this.analyser.getByteTimeDomainData(dataArray);
+      this.analyser.getFloatFrequencyData(freqDomain);
+      this.analyser.getFloatTimeDomainData(freqDomain);
 
       this.drawVisual = requestAnimationFrame(drawAlt);
       this.updatePitch();
@@ -698,6 +710,11 @@ export class AppComponent {
       this.rollingAveragePitchDataPoints.push(this.rangeAverage);
       this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
     }
+  }
+
+  // for amplitude
+  generateAmplitudeChart(array) {
+    console.log('Amplitude array: ', array);
   }
 
 }
