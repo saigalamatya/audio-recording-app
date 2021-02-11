@@ -126,6 +126,12 @@ export class AppComponent {
   rollingAverageAmplitudeDataSource = [];
   rollingAverageAmplitudeDataPoints = [];
   rollingAverageAmplitudeRange = [];
+  public primaryYAxisForAmplitude: Object = {
+    title: "Amplitude",
+    minimum: 0,
+    majorTickLines: { width: 0 },
+    lineStyle: { width: 0 }
+  };
 
   constructor(
     private elementRef: ElementRef,
@@ -508,7 +514,7 @@ export class AppComponent {
   public primaryXAxis: Object = {
     title: "Index",
     edgeLabelPlacement: "Shift",
-    majorGridLines: { width: 0 },
+    majorGridLines: { width: 0, color: 'blue' },
     labelFormat: "n1"
   };
 
@@ -516,8 +522,8 @@ export class AppComponent {
 
   public chartArea: Object = { border: { width: 0 } };
 
-  public primaryYAxis: Object = {
-    title: "Pitch & Amplitude",
+  public primaryYAxisForPitch: Object = {
+    title: "Pitch",
     minimum: 0,
     majorTickLines: { width: 0 },
     lineStyle: { width: 0 }
@@ -560,15 +566,6 @@ export class AppComponent {
     console.log('args:ASDasd', args)
     for (let i: number = 0; i < args.length; i++) {
       chartAnnotation.push({
-        // content:
-        //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
-        //   "background: " +
-        //   backgroundColor +
-        //   "; border: 2px solid " +
-        //   color +
-        //   "; color:" +
-        //   color +
-        //   '">W</div>',
         x: args[i]["x"],
         y: args[i]["y"],
         coordinateUnits: "Point"
