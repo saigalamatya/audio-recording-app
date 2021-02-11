@@ -129,6 +129,8 @@ export class AppComponent {
   public primaryYAxisForAmplitude: Object = {
     title: "Amplitude",
     minimum: 0,
+    maximum: 30,
+    interval: 2,
     majorTickLines: { width: 0 },
     lineStyle: { width: 0 }
   };
@@ -276,21 +278,21 @@ export class AppComponent {
     this.link.download = new Date().toISOString() + '.wav';
 
     console.log('Audio: ', this.au);
-    this.au.play();
+    // this.au.play();
 
-    this.wavesurfer = WaveSurfer.create({
-      container: document.querySelector('#waveform'),
-      barWidth: 2,
-      barHeight: 1, // the height of the wave
-      barGap: null, // the optional spacing between bars of the wave, if not provided will be calculated in legacy format
-      waveColor: 'violet',
-      progressColor: 'purple'
-    });
-    console.log('Wave surfer: ', this.wavesurfer);
-    this.wavesurfer.loadBlob(blob);
-    this.wavesurfer.on('ready', function () {
-      this.wavesurfer.play();
-    });
+    // this.wavesurfer = WaveSurfer.create({
+    //   container: document.querySelector('#waveform'),
+    //   barWidth: 2,
+    //   barHeight: 1, // the height of the wave
+    //   barGap: null, // the optional spacing between bars of the wave, if not provided will be calculated in legacy format
+    //   waveColor: 'violet',
+    //   progressColor: 'purple'
+    // });
+    // console.log('Wave surfer: ', this.wavesurfer);
+    // this.wavesurfer.loadBlob(blob);
+    // this.wavesurfer.on('ready', function () {
+    //   this.wavesurfer.play();
+    // });
   }
 
   visualize() {
@@ -633,21 +635,13 @@ export class AppComponent {
     args = args.map((data, i) => {
       return {
         x: i + 1,
-        y: parseFloat(data)
+        y: parseFloat(data),
+        color: '#1E13EC'
       }
     });
     console.log('Rolling average data points source: ', args)
     for (let i: number = 0; i < args.length; i++) {
       chartAnnotation.push({
-        // content:
-        //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
-        //   "background: " +
-        //   backgroundColor +
-        //   "; border: 2px solid " +
-        //   color +
-        //   "; color:" +
-        //   color +
-        //   '">W</div>',
         x: args[i]["x"],
         y: args[i]["y"],
         coordinateUnits: "Point"
@@ -675,19 +669,6 @@ export class AppComponent {
     }
   }
 
-  // changeStartingPoint($event) {
-  //   this.incrementSizeEntered = true;
-  //   console.log('Starting point: ', $event.target.value);
-  //   if (parseInt($event.target.value) > 0) {
-  //     this.startingPoint = parseInt($event.target.value);
-  //     this.rangeValue = [this.startingPoint, this.rangeValue[1]];
-  //   } else {
-  //     this.startingPoint = 1;
-  //   }
-  //   this.rangeFrom = this.startingPoint;
-  //   // this.Chart.dataBind();
-  // }
-
   changeRangeSize($event) {
     if (parseInt($event.target.value) > 0) {
       this.rangeSize = parseInt($event.target.value);
@@ -713,7 +694,7 @@ export class AppComponent {
       //       this.rangeAverage = Math.round((sum / args.selectedData.length + Number.EPSILON) * 100) / 100;
       // console.log('Average pitch: ', this.rangeAverage);
       for (let j = i; j < i + this.rangeSize; j++) {
-        if (this.dataSource[j]['y']) {
+        if (this.dataSource[j]) {
           sum += this.dataSource[j]['y'];
         }
       }
