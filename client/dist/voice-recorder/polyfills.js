@@ -5777,7 +5777,7 @@ window['global'] = window;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\Users\Novelty\Desktop\Projects\voice-recorder\client\src\polyfills.ts */"./src/polyfills.ts");
+module.exports = __webpack_require__(/*! /home/novelty/programming/POC/audio-recording-app/client/src/polyfills.ts */"./src/polyfills.ts");
 
 
 /***/ })
