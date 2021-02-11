@@ -120,6 +120,22 @@ export class AppComponent {
   rangeFrom = 0;
   incrementSizeEntered = false;
 
+  // for amplitude
+  amplitudeDataSource = [];
+  amplitudeRangeValue = [];
+  rollingAverageAmplitudeDataSource = [];
+  rollingAverageAmplitudeDataPoints = [];
+  rollingAverageAmplitudeRange = [];
+  public primaryYAxisForAmplitude: Object = {
+    labelFormat: "{value} dB",
+    title: "Amplitude",
+    minimum: 0,
+    maximum: 30,
+    interval: 2,
+    majorTickLines: { width: 0 },
+    lineStyle: { width: 0 }
+  };
+
   constructor(
     private elementRef: ElementRef,
     private _renderer: Renderer2,
@@ -212,6 +228,7 @@ export class AppComponent {
     });
 
     this.pitchDataPoints = this.lineChartData[0]['data'];
+    console.log('Line chart data: ', this.lineChartData[0]['data']);
     this.generateChartData();
     this.getAnnotaiton(this.lineChartData[0]['data'].filter(x => x != 0), getSeriesColor(theme)[1]);
     this.displayLineGraph = true;
@@ -262,21 +279,21 @@ export class AppComponent {
     this.link.download = new Date().toISOString() + '.wav';
 
     console.log('Audio: ', this.au);
-    this.au.play();
+    // this.au.play();
 
-    this.wavesurfer = WaveSurfer.create({
-      container: document.querySelector('#waveform'),
-      barWidth: 2,
-      barHeight: 1, // the height of the wave
-      barGap: null, // the optional spacing between bars of the wave, if not provided will be calculated in legacy format
-      waveColor: 'violet',
-      progressColor: 'purple'
-    });
-    console.log('Wave surfer: ', this.wavesurfer);
-    this.wavesurfer.loadBlob(blob);
-    this.wavesurfer.on('ready', function () {
-      this.wavesurfer.play();
-    });
+    // this.wavesurfer = WaveSurfer.create({
+    //   container: document.querySelector('#waveform'),
+    //   barWidth: 2,
+    //   barHeight: 1, // the height of the wave
+    //   barGap: null, // the optional spacing between bars of the wave, if not provided will be calculated in legacy format
+    //   waveColor: 'violet',
+    //   progressColor: 'purple'
+    // });
+    // console.log('Wave surfer: ', this.wavesurfer);
+    // this.wavesurfer.loadBlob(blob);
+    // this.wavesurfer.on('ready', function () {
+    //   this.wavesurfer.play();
+    // });
   }
 
   visualize() {
@@ -284,7 +301,7 @@ export class AppComponent {
     let WIDTH = this.canvas.nativeElement.width;
     let HEIGHT = this.canvas.nativeElement.height;
 
-    this.analyser.fftSize = 2048;
+    this.analyser.fftSize = 1024;
 
     var bufferLength = this.analyser.frequencyBinCount;
     var dataArray = new Uint8Array(bufferLength);
@@ -292,13 +309,19 @@ export class AppComponent {
     this.canvasCtx.clearRect(0, 0, 500, 100);
 
     var drawAlt = () => {
-      console.log("data array: ", dataArray);
+      // console.log("data array: ", dataArray);
+      console.log("freq domain: ", freqDomain);
 
       console.log('Analyser: ', this.analyser);
 
-      this.audioBufferData.push(Object.assign({ time: this.audioCtx.currentTime, data: dataArray }));
-      // audioBufferArray = audioBufferArray.concat([...dataArray]);
-      dataArray.forEach(x => {
+      // this.audioBufferData.push(Object.assign({ time: this.audioCtx.currentTime, data: dataArray }));
+      // // audioBufferArray = audioBufferArray.concat([...dataArray]);
+      // dataArray.forEach(x => {
+      //   this.audioBufferArray.push(x);
+      // });
+
+      this.audioBufferData.push(Object.assign({ time: this.audioCtx.currentTime, data: freqDomain }));
+      freqDomain.forEach(x => {
         this.audioBufferArray.push(x);
       });
 
@@ -306,11 +329,14 @@ export class AppComponent {
       console.log('Audio Buffer array: ', this.audioBufferArray);
 
       // getByteFrequencyData() -> copies current frequency data into unassigned byte array passed into it
-      this.analyser.getByteFrequencyData(dataArray);
-      this.analyser.getByteTimeDomainData(dataArray);
+      // this.analyser.getByteFrequencyData(dataArray);
+      // this.analyser.getByteTimeDomainData(dataArray);
+      this.analyser.getFloatFrequencyData(freqDomain);
+      this.analyser.getFloatTimeDomainData(freqDomain);
 
       this.drawVisual = requestAnimationFrame(drawAlt);
       this.updatePitch();
+      // this.calculateRMS(freqDomain);
 
       console.log('Draw visual: ', this.drawVisual);
 
@@ -349,21 +375,22 @@ export class AppComponent {
   updatePitch() {
     this.analyser.getFloatTimeDomainData(this.buffer);
     var ac = this.autoCorrelate(this.buffer, this.audioCtx.sampleRate);
+    console.log('AC: ', ac);
 
     if (ac == -1) {
+      console.log('Pitch <<<: ', ac)
       this.pitch = 0;
     } else {
       this.pitch = ac;
     }
-
+    console.log('Amplitude decibel value: ', 10 * Math.log10(ac));
+    console.log('Pitch: ', this.pitch);
     let time = 0;
     let sec = 1000;
     var interval = setInterval(() => {
       time += sec;
       if (this.audioCtx.state == 'running') {
         this.lineChartData[0]['data'].push(this.pitch.toFixed(2));
-
-        console.log('asdasd: ', this.lineChartData);
       } else {
         clearInterval(interval);
       }
@@ -460,8 +487,8 @@ export class AppComponent {
     this.scrollbarX.series.push(this.series);
     this.amChart.scrollbarX = this.scrollbarX;
 
-    console.log('Scroll bar: ', this.scrollbarX);
-    console.log('Series: ', this.series);
+    // console.log('Scroll bar: ', this.scrollbarX);
+    // console.log('Series: ', this.series);
 
     this.amChart = this.amChart;
   }
@@ -477,6 +504,7 @@ export class AppComponent {
     }
     this.generateChartData();
     this.getAnnotaiton(this.lineChartData[0]['data'], getSeriesColor(theme)[1]);
+    this.calculateRollingAverage();
   }
 
   toggleScroll() {
@@ -490,7 +518,7 @@ export class AppComponent {
   public primaryXAxis: Object = {
     title: "Index",
     edgeLabelPlacement: "Shift",
-    majorGridLines: { width: 0 },
+    majorGridLines: { width: 0, color: 'blue' },
     labelFormat: "n1"
   };
 
@@ -498,7 +526,8 @@ export class AppComponent {
 
   public chartArea: Object = { border: { width: 0 } };
 
-  public primaryYAxis: Object = {
+  public primaryYAxisForPitch: Object = {
+    labelFormat: "{value} Hz",
     title: "Pitch",
     minimum: 0,
     majorTickLines: { width: 0 },
@@ -542,15 +571,6 @@ export class AppComponent {
     console.log('args:ASDasd', args)
     for (let i: number = 0; i < args.length; i++) {
       chartAnnotation.push({
-        // content:
-        //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
-        //   "background: " +
-        //   backgroundColor +
-        //   "; border: 2px solid " +
-        //   color +
-        //   "; color:" +
-        //   color +
-        //   '">W</div>',
         x: args[i]["x"],
         y: args[i]["y"],
         coordinateUnits: "Point"
@@ -558,6 +578,7 @@ export class AppComponent {
     }
     this.rangeValue = [args[0]['x'], args[args.length - 1]['x']];
     this.dataSource = args;
+    this.generateAmplitudeChart(this.dataSource);
     console.log('Range value: ', this.rangeValue);
     console.log('data source: ', this.dataSource);
   }
@@ -608,11 +629,11 @@ export class AppComponent {
         this.rangeFrom = this.rangeFrom + this.rangeSize;
       }
       console.log('Rolling average data [points]: ', this.rollingAveragePitchDataPoints);
-      this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
+      this.generateRollingAverageChart(this.rollingAveragePitchDataPoints);
     }
   }
 
-  generateRollingAveragePitchChart(args) {
+  generateRollingAverageChart(args) {
     console.log('Args: ', args);
     args = args.map((data, i) => {
       return {
@@ -623,22 +644,20 @@ export class AppComponent {
     console.log('Rolling average data points source: ', args)
     for (let i: number = 0; i < args.length; i++) {
       chartAnnotation.push({
-        // content:
-        //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
-        //   "background: " +
-        //   backgroundColor +
-        //   "; border: 2px solid " +
-        //   color +
-        //   "; color:" +
-        //   color +
-        //   '">W</div>',
         x: args[i]["x"],
         y: args[i]["y"],
         coordinateUnits: "Point"
       });
     }
     this.rollingAverageDataSource = args;
-    console.log('fifififi: ', this.rollingAverageDataSource);
+    this.rollingAverageAmplitudeDataSource = args.map((data, i) => {
+      return {
+        x: i + 1,
+        y: (10 * Math.log10(parseFloat(data['y']))) == -Infinity ? 0 : (10 * Math.log10(parseFloat(data['y'])))
+      }
+    });
+    console.log('Rolling average pitch data source: ', this.rollingAverageDataSource);
+    console.log('Rolling average amplitude data source: ', this.rollingAverageAmplitudeDataSource);
   }
 
   changeIncrementSize($event) {
@@ -652,19 +671,6 @@ export class AppComponent {
     }
   }
 
-  // changeStartingPoint($event) {
-  //   this.incrementSizeEntered = true;
-  //   console.log('Starting point: ', $event.target.value);
-  //   if (parseInt($event.target.value) > 0) {
-  //     this.startingPoint = parseInt($event.target.value);
-  //     this.rangeValue = [this.startingPoint, this.rangeValue[1]];
-  //   } else {
-  //     this.startingPoint = 1;
-  //   }
-  //   this.rangeFrom = this.startingPoint;
-  //   // this.Chart.dataBind();
-  // }
-
   changeRangeSize($event) {
     if (parseInt($event.target.value) > 0) {
       this.rangeSize = parseInt($event.target.value);
@@ -672,9 +678,6 @@ export class AppComponent {
     } else {
       this.rangeSize = 0;
     }
-    // this.rangeFrom = this.rangeFrom + this.rangeSize;
-
-    // this.calculateRollingAverage();
   }
 
   calculateRollingAverage() {
@@ -682,22 +685,51 @@ export class AppComponent {
     console.log('asdasd: ', this.dataSource);
     console.log('123123: ', Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize);
     // let z = 0;
-    for (let i = this.startingPoint; i <= Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.incrementSize) {
+    for (let i = this.startingPoint; i < Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.incrementSize) {
       let sum = 0;
       console.log('i: ', i);
       // z = i;
       // console.log('Range Average::::::::::::::::', this.rangeAverage);
       //       this.rangeAverage = Math.round((sum / args.selectedData.length + Number.EPSILON) * 100) / 100;
       // console.log('Average pitch: ', this.rangeAverage);
-      for (let j = i; j <= i + this.rangeSize; j++) {
-        sum += this.dataSource[j]['y'];
+      for (let j = i; j < i + this.rangeSize; j++) {
+        if (this.dataSource[j]) {
+          sum += this.dataSource[j]['y'];
+        }
       }
       // this.rangeAverage = sum / this.rangeSize;
       this.rangeAverage = Math.round((sum / this.rangeSize + Number.EPSILON) * 100) / 100;
+
       console.log('Average pitch: ', this.rangeAverage);
       this.rollingAveragePitchDataPoints.push(this.rangeAverage);
-      this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
+      console.log('Roll: ', this.rollingAveragePitchDataPoints);
+      this.generateRollingAverageChart(this.rollingAveragePitchDataPoints);
     }
+  }
+
+  // for amplitude
+  generateAmplitudeChart(array) {
+    console.log('Amplitude array: ', array);
+    array = array.map((data, i) => {
+      return {
+        x: i + 1,
+        y: (10 * Math.log10(parseFloat(data['y']))) == -Infinity ? 0 : (10 * Math.log10(parseFloat(data['y'])))
+      }
+    });
+    console.log('Amplitude args:', array);
+    this.amplitudeDataSource = array;
+  }
+
+  // RMS -> Root Mean Squared
+  calculateRMS(array) {
+
+    let rms = Math.sqrt(
+      array
+        .map(val => (val * val))
+        .reduce((acum, val) => acum + val)
+      / array.length
+    );
+    console.log('RMS value: ', rms);
   }
 
 }

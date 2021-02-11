@@ -8,7 +8,6 @@ const app = express();
 app.use( express.static( path.join( __dirname, 'client/dist/voice-recorder' ) ) );
 app.use( bodyParser.json() );
 
-//For testing
 app.get( '/api', ( req, res ) => {
   res.json( { message: 'Novelty EmsWebPortal is up running.' } );
 } );
