@@ -41,7 +41,7 @@ module.exports = ""
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"container-fluid\">\n\n  <div class=\"alert alert-warning alert-dismissible fade show\" role=\"alert\">\n    <strong>Welcome!</strong> For the time being the recording length is set to 10 seconds max.\n    <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">\n      <span aria-hidden=\"true\">&times;</span>\n    </button>\n  </div>\n\n  <!-- <div class=\"wrapper\" #wrapper> -->\n  <div class=\"btn-group mt-2 mb-2\">\n    <button *ngIf=\"!isRecording\" type=\"button\" class=\"btn btn-primary\" (click)=\"startRecording()\">Record</button>&nbsp;\n    <button *ngIf=\"isRecording\" type=\"button\" class=\"btn btn-danger\" (click)=\"stopRecording()\">Stop</button>\n  </div>\n  <div class=\"row\">\n    <canvas class=\"visualizer ml-3\" width=\"640\" height=\"100\" #myCanvas></canvas>\n  </div>\n\n  <div class=\"row\">\n    <!-- <canvas class=\"sine-wave-visualizer\" width=\"300\" height=\"100\"></canvas> -->\n    <div id=\"waveform\"></div>\n\n    <div class=\"waveform-container\">\n      <div class=\"zoom-view-container\"></div>\n      <div class=\"overview-container\"></div>\n    </div>\n    <!-- </div> -->\n  </div>\n\n  <div class=\"row\">\n    <label class=\"ml-3\">Pitch: {{pitch.toFixed(2)}}Hz</label>\n    <!-- <div *ngIf=\"recordCompleted\">\n      <div class=\"form-group form-check\">\n        <button type=\"button\" class=\"btn btn-primary\" (click)=\"togglePitchDisplay()\">\n          {{pitchShowHideText}} </button>\n      </div>\n    </div> -->\n  </div>\n  <div class=\"row\">\n    <div class=\"form-check ml-3\" *ngIf=\"recordCompleted\">\n      <input class=\"form-check-input\" type=\"checkbox\" data-toggle=\"toggle\" [checked]=\"hideZeroes\"\n        name=\"showHideCheckBox\" (change)=\"togglePitchDisplay()\">\n      <label class=\"form-check-label\" for=\"showHideCheckBox\">\n        {{pitchShowHideText}}\n      </label>\n    </div>\n  </div>\n  <!-- <div id=\"chartdiv\" style=\"width: 100%; height: 500px\"></div> -->\n\n  <div class=\"control-section\" *ngIf=\"recordCompleted\">\n    <!-- <div class=\"row\">\n      Average pitch of selected range: {{rangeAverage}} Hz\n      <button type=\"button\" class=\"btn btn-success\" (click)=\"addToRollingAverage()\">Add to Rolling Average</button>\n      <input type=\"number\" class=\"form-control col-sm-3\" name=\"rangeSize\" [(ngModel)]=\"rangeSize\"\n        placeholder=\"Enter range size\" (change)=\"changeRangeSize($event)\">\n    </div> -->\n    <form>\n      <div class=\"form-group row\">\n        <label for=\"startingPoint\" class=\"col-sm-2 col-form-label\">Increment size:</label>\n        <div class=\"col-sm-3\">\n          <input type=\"text\" class=\"form-control\" name=\"startingPoint\" [(ngModel)]=\"incrementSize\"\n            (change)=\"changeIncrementSize($event)\" placeholder=\"Enter increment size...\" tabindex=\"1\">\n        </div>\n      </div>\n      <div class=\"form-group row\">\n        <label for=\"range\" class=\"col-sm-2 col-form-label\">Range: </label>\n        <div class=\"col-sm-3\">\n          <input type=\"text\" class=\"form-control\" name=\"range\" [(ngModel)]=\"rangeSize\"\n            (change)=\"changeRangeSize($event)\" placeholder=\"Enter range...\" [readonly]=\"!incrementSizeEntered\"\n            [title]=\"!incrementSizeEntered ? 'Please enter starting point before entering range.': ''\" tabindex=\"2\">\n        </div>\n      </div>\n\n      <div class=\"form-group row\">\n        <label for=\"range\" class=\"col-sm-2 col-form-label\"> </label>\n        <button *ngIf=\"rangeSize\" type=\"button\" class=\"btn btn-primary ml-3\"\n          (click)=\"calculateRollingAverage()\">Generate\n          Rolling\n          Average</button>\n      </div>\n\n    </form>\n    <label>Pitch Chart</label>\n    <br />\n    <div class=\"row\" align=\"center\">\n      <!-- <div align=\"center\">\n        <ejs-rangenavigator style='display:block' align='center' id='containerDouble' [value]='rangeValue'\n          labelPosition='Outside' [width]='width' (changed)='changed($event)' [theme]='theme' [tooltip]='tooltip'\n          (tooltipRender)='tooltipRender($event)' (load)='load($event)'>\n          <e-rangenavigator-series-collection>\n            <e-rangenavigator-series [dataSource]='dataSource' xName='x' yName='y' width=2 name='SL'>\n            </e-rangenavigator-series>\n          </e-rangenavigator-series-collection>\n        </ejs-rangenavigator>\n      </div> -->\n      <div align=\"center\">\n        <ejs-chart #chartDouble style='display:block;' id='chartDouble' align='center' [chartArea]='chartArea'\n          [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis' height='350' [theme]='theme'\n          [tooltip]='tooltip' [annotations]='annotations' [legendSettings]='legendSettings'\n          (axisLabelRender)='axisLabelRender($event)'>\n          <e-series-collection>\n            <e-series [dataSource]='dataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'\n              [marker]=\"marker\" [animation]='animation'>\n            </e-series>\n          </e-series-collection>\n        </ejs-chart>\n      </div>\n    </div>\n    <label>Rolling Average Chart</label>\n    <br />\n    <div class=\"row\">\n      <div align=\"center\">\n        <ejs-chart #rollingAverageChart style='display:block;' id='rollingAverageChart' align='center'\n          [chartArea]='chartArea' [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis'\n          height='350' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations'\n          (axisLabelRender)='axisLabelRender($event)'>\n          <e-series-collection>\n            <e-series [dataSource]='rollingAverageDataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'\n              [marker]=\"marker\" [animation]='animation'>\n            </e-series>\n          </e-series-collection>\n        </ejs-chart>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div style=\"position: relative\">\n  <!-- the position of the parent container must be set to relative -->\n  <!-- It is really important to set loaderId for non-master loader -->\n  <ngx-ui-loader [loaderId]=\"'loader-01'\"></ngx-ui-loader>\n</div>\n\n<div style=\"position: relative\">\n  <!-- the position of the parent container must be set to relative -->\n  <!-- It is really important to set loaderId for non-master loader -->\n  <ngx-ui-loader [loaderId]=\"'loader-02'\"></ngx-ui-loader>\n</div>\n\n<ngx-ui-loader [text]=\"'Generating chart ...'\"></ngx-ui-loader>"
+module.exports = "<div class=\"container-fluid\">\n\n  <div class=\"alert alert-warning alert-dismissible fade show\" role=\"alert\">\n    <strong>Welcome!</strong> For the time being the recording length is set to 10 seconds max.\n    <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">\n      <span aria-hidden=\"true\">&times;</span>\n    </button>\n  </div>\n\n  <!-- <div class=\"wrapper\" #wrapper> -->\n  <div class=\"btn-group mt-2 mb-2\">\n    <button *ngIf=\"!isRecording\" type=\"button\" class=\"btn btn-primary\" (click)=\"startRecording()\">Record</button>&nbsp;\n    <button *ngIf=\"isRecording\" type=\"button\" class=\"btn btn-danger\" (click)=\"stopRecording()\">Stop</button>\n  </div>\n  <div class=\"row\">\n    <canvas class=\"visualizer ml-3\" width=\"640\" height=\"100\" #myCanvas></canvas>\n  </div>\n\n  <!-- <div class=\"row\">\n    <div id=\"waveform\"></div>\n\n    <div class=\"waveform-container\">\n      <div class=\"zoom-view-container\"></div>\n      <div class=\"overview-container\"></div>\n    </div>\n  </div> -->\n\n  <div class=\"row\">\n    <label class=\"ml-3\">Pitch: {{pitch.toFixed(2)}}Hz</label>\n    <!-- <div *ngIf=\"recordCompleted\">\n      <div class=\"form-group form-check\">\n        <button type=\"button\" class=\"btn btn-primary\" (click)=\"togglePitchDisplay()\">\n          {{pitchShowHideText}} </button>\n      </div>\n    </div> -->\n  </div>\n  <div class=\"row\">\n    <div class=\"form-check ml-3\" *ngIf=\"recordCompleted\">\n      <input class=\"form-check-input\" type=\"checkbox\" data-toggle=\"toggle\" [checked]=\"hideZeroes\"\n        name=\"showHideCheckBox\" (change)=\"togglePitchDisplay()\">\n      <label class=\"form-check-label\" for=\"showHideCheckBox\">\n        {{pitchShowHideText}}\n      </label>\n    </div>\n  </div>\n  <!-- <div id=\"chartdiv\" style=\"width: 100%; height: 500px\"></div> -->\n\n  <div class=\"control-section\" *ngIf=\"recordCompleted\">\n    <!-- <div class=\"row\">\n      Average pitch of selected range: {{rangeAverage}} Hz\n      <button type=\"button\" class=\"btn btn-success\" (click)=\"addToRollingAverage()\">Add to Rolling Average</button>\n      <input type=\"number\" class=\"form-control col-sm-3\" name=\"rangeSize\" [(ngModel)]=\"rangeSize\"\n        placeholder=\"Enter range size\" (change)=\"changeRangeSize($event)\">\n    </div> -->\n    <form>\n      <div class=\"form-group row\">\n        <label for=\"startingPoint\" class=\"col-sm-2 col-form-label\">Increment size:</label>\n        <div class=\"col-sm-3\">\n          <input type=\"text\" class=\"form-control\" name=\"startingPoint\" [(ngModel)]=\"incrementSize\"\n            (change)=\"changeIncrementSize($event)\" placeholder=\"Enter increment size...\" tabindex=\"1\">\n        </div>\n      </div>\n      <div class=\"form-group row\">\n        <label for=\"range\" class=\"col-sm-2 col-form-label\">Range: </label>\n        <div class=\"col-sm-3\">\n          <input type=\"text\" class=\"form-control\" name=\"range\" [(ngModel)]=\"rangeSize\"\n            (change)=\"changeRangeSize($event)\" placeholder=\"Enter range...\" [readonly]=\"!incrementSizeEntered\"\n            [title]=\"!incrementSizeEntered ? 'Please enter starting point before entering range.': ''\" tabindex=\"2\">\n        </div>\n      </div>\n\n      <div class=\"form-group row\">\n        <label for=\"range\" class=\"col-sm-2 col-form-label\"> </label>\n        <button *ngIf=\"rangeSize\" type=\"button\" class=\"btn btn-primary ml-3\"\n          (click)=\"calculateRollingAverage()\">Generate\n          Rolling\n          Average</button>\n      </div>\n\n    </form>\n    <label>Amplitude Chart</label>\n    <br />\n    <div class=\"row\">\n      <div align=\"center\">\n        <ejs-chart #amplitudeChart style='display:block;' id='amplitudeChart' align='center' [chartArea]='chartArea'\n          [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxisForAmplitude' height='300'\n          [theme]='theme' [tooltip]='tooltip' [annotations]='annotations' (axisLabelRender)='axisLabelRender($event)'>\n          <e-series-collection>\n            <e-series [dataSource]='amplitudeDataSource' name='Amplitude' type='Spline' xName='x' yName='y' width='2'\n              [marker]=\"marker\" [animation]='animation' [fill]=\"'#e74c3d'\">\n            </e-series>\n          </e-series-collection>\n        </ejs-chart>\n      </div>\n    </div>\n    <label>Pitch Chart</label>\n    <br />\n    <div class=\"row\" align=\"center\">\n      <!-- <div align=\"center\">\n        <ejs-rangenavigator style='display:block' align='center' id='containerDouble' [value]='rangeValue'\n          labelPosition='Outside' [width]='width' (changed)='changed($event)' [theme]='theme' [tooltip]='tooltip'\n          (tooltipRender)='tooltipRender($event)' (load)='load($event)'>\n          <e-rangenavigator-series-collection>\n            <e-rangenavigator-series [dataSource]='dataSource' xName='x' yName='y' width=2 name='SL'>\n            </e-rangenavigator-series>\n          </e-rangenavigator-series-collection>\n        </ejs-rangenavigator>\n      </div> -->\n      <div align=\"center\">\n        <ejs-chart #chartDouble style='display:block;' id='chartDouble' align='center' [chartArea]='chartArea'\n          [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxisForPitch' height='300'\n          [theme]='theme' [tooltip]='tooltip' [annotations]='annotations' (axisLabelRender)='axisLabelRender($event)'>\n          <e-series-collection>\n            <e-series [dataSource]='dataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'\n              [marker]=\"marker\" [animation]='animation'>\n            </e-series>\n          </e-series-collection>\n        </ejs-chart>\n      </div>\n    </div>\n    <label>Rolling Average (Amplitude)</label>\n    <br />\n    <div class=\"row\">\n      <div align=\"center\">\n        <ejs-chart #rollingAverageAmplitudeChart style='display:block;' id='rollingAverageAmplitudeChart' align='center'\n          [chartArea]='chartArea' [width]='width' [primaryXAxis]='primaryXAxis'\n          [primaryYAxis]='primaryYAxisForAmplitude' height='300' [theme]='theme' [tooltip]='tooltip'\n          [annotations]='annotations' (axisLabelRender)='axisLabelRender($event)'>\n          <e-series-collection>\n            <e-series [dataSource]='rollingAverageAmplitudeDataSource' name='Amplitude' type='Spline' xName='x'\n              yName='y' width='2' [marker]=\"marker\" [animation]='animation' [fill]=\"'#e74c3d'\">\n            </e-series>\n          </e-series-collection>\n        </ejs-chart>\n      </div>\n    </div>\n    <label>Rolling Average (Pitch)</label>\n    <br />\n    <div class=\"row\">\n      <div align=\"center\">\n        <ejs-chart #rollingAveragePitchChart style='display:block;' id='rollingAveragePitchChart' align='center'\n          [chartArea]='chartArea' [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxisForPitch'\n          height='300' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations'\n          (axisLabelRender)='axisLabelRender($event)'>\n          <e-series-collection>\n            <e-series [dataSource]='rollingAverageDataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'\n              [marker]=\"marker\" [animation]='animation'>\n            </e-series>\n          </e-series-collection>\n        </ejs-chart>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div style=\"position: relative\">\n  <!-- the position of the parent container must be set to relative -->\n  <!-- It is really important to set loaderId for non-master loader -->\n  <ngx-ui-loader [loaderId]=\"'loader-01'\"></ngx-ui-loader>\n</div>\n\n<div style=\"position: relative\">\n  <!-- the position of the parent container must be set to relative -->\n  <!-- It is really important to set loaderId for non-master loader -->\n  <ngx-ui-loader [loaderId]=\"'loader-02'\"></ngx-ui-loader>\n</div>\n\n<ngx-ui-loader [text]=\"'Generating chart ...'\"></ngx-ui-loader>"
 
 /***/ }),
 
@@ -56,15 +56,13 @@ module.exports = "<div class=\"container-fluid\">\n\n  <div class=\"alert alert-
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppComponent", function() { return AppComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var wavesurfer_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! wavesurfer.js */ "./node_modules/wavesurfer.js/dist/wavesurfer.js");
-/* harmony import */ var wavesurfer_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(wavesurfer_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var recordrtc__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! recordrtc */ "./node_modules/recordrtc/RecordRTC.js");
-/* harmony import */ var recordrtc__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(recordrtc__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _amcharts_amcharts4_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @amcharts/amcharts4/core */ "./node_modules/@amcharts/amcharts4/core.js");
-/* harmony import */ var _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @amcharts/amcharts4/charts */ "./node_modules/@amcharts/amcharts4/charts.js");
-/* harmony import */ var _amcharts_amcharts4_themes_animated__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @amcharts/amcharts4/themes/animated */ "./node_modules/@amcharts/amcharts4/themes/animated.js");
-/* harmony import */ var _syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @syncfusion/ej2-charts */ "./node_modules/@syncfusion/ej2-charts/index.js");
-/* harmony import */ var ngx_ui_loader__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ngx-ui-loader */ "./node_modules/ngx-ui-loader/fesm5/ngx-ui-loader.js");
+/* harmony import */ var recordrtc__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! recordrtc */ "./node_modules/recordrtc/RecordRTC.js");
+/* harmony import */ var recordrtc__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(recordrtc__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _amcharts_amcharts4_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @amcharts/amcharts4/core */ "./node_modules/@amcharts/amcharts4/core.js");
+/* harmony import */ var _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @amcharts/amcharts4/charts */ "./node_modules/@amcharts/amcharts4/charts.js");
+/* harmony import */ var _amcharts_amcharts4_themes_animated__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @amcharts/amcharts4/themes/animated */ "./node_modules/@amcharts/amcharts4/themes/animated.js");
+/* harmony import */ var _syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @syncfusion/ej2-charts */ "./node_modules/@syncfusion/ej2-charts/index.js");
+/* harmony import */ var ngx_ui_loader__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ngx-ui-loader */ "./node_modules/ngx-ui-loader/fesm5/ngx-ui-loader.js");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -74,7 +72,6 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 var __metadata = (undefined && undefined.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-
 
 
 
@@ -130,14 +127,30 @@ var AppComponent = /** @class */ (function () {
         this.rangeSize = 0;
         this.rangeFrom = 0;
         this.incrementSizeEntered = false;
+        // for amplitude
+        this.amplitudeDataSource = [];
+        this.amplitudeRangeValue = [];
+        this.rollingAverageAmplitudeDataSource = [];
+        this.rollingAverageAmplitudeDataPoints = [];
+        this.rollingAverageAmplitudeRange = [];
+        this.primaryYAxisForAmplitude = {
+            labelFormat: "{value} dB",
+            title: "Amplitude",
+            minimum: 0,
+            maximum: 30,
+            interval: 2,
+            majorTickLines: { width: 0 },
+            lineStyle: { width: 0 }
+        };
         this.primaryXAxis = {
             title: "Index",
             edgeLabelPlacement: "Shift",
-            majorGridLines: { width: 0 },
+            majorGridLines: { width: 0, color: 'blue' },
             labelFormat: "n1"
         };
         this.chartArea = { border: { width: 0 } };
-        this.primaryYAxis = {
+        this.primaryYAxisForPitch = {
+            labelFormat: "{value} Hz",
             title: "Pitch",
             minimum: 0,
             majorTickLines: { width: 0 },
@@ -201,7 +214,7 @@ var AppComponent = /** @class */ (function () {
                     type: 'audio',
                     mimeType: 'audio/wav',
                 };
-                _this.recordRTC = recordrtc__WEBPACK_IMPORTED_MODULE_2__(stream, options);
+                _this.recordRTC = recordrtc__WEBPACK_IMPORTED_MODULE_1__(stream, options);
                 _this.recordRTC.startRecording();
                 // let timer = 0;
                 // var timerId = setInterval(() => {
@@ -227,8 +240,9 @@ var AppComponent = /** @class */ (function () {
             track.stop();
         });
         this.pitchDataPoints = this.lineChartData[0]['data'];
+        console.log('Line chart data: ', this.lineChartData[0]['data']);
         this.generateChartData();
-        this.getAnnotaiton(this.lineChartData[0]['data'].filter(function (x) { return x != 0; }), Object(_syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_6__["getSeriesColor"])(theme)[1]);
+        this.getAnnotaiton(this.lineChartData[0]['data'].filter(function (x) { return x != 0; }), Object(_syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_5__["getSeriesColor"])(theme)[1]);
         this.displayLineGraph = true;
         this.audioCtx.close();
         cancelAnimationFrame(this.drawVisual);
@@ -266,45 +280,53 @@ var AppComponent = /** @class */ (function () {
         this.link.href = this.url;
         this.link.download = new Date().toISOString() + '.wav';
         console.log('Audio: ', this.au);
-        this.au.play();
-        this.wavesurfer = wavesurfer_js__WEBPACK_IMPORTED_MODULE_1__["create"]({
-            container: document.querySelector('#waveform'),
-            barWidth: 2,
-            barHeight: 1,
-            barGap: null,
-            waveColor: 'violet',
-            progressColor: 'purple'
-        });
-        console.log('Wave surfer: ', this.wavesurfer);
-        this.wavesurfer.loadBlob(blob);
-        this.wavesurfer.on('ready', function () {
-            this.wavesurfer.play();
-        });
+        // this.au.play();
+        // this.wavesurfer = WaveSurfer.create({
+        //   container: document.querySelector('#waveform'),
+        //   barWidth: 2,
+        //   barHeight: 1, // the height of the wave
+        //   barGap: null, // the optional spacing between bars of the wave, if not provided will be calculated in legacy format
+        //   waveColor: 'violet',
+        //   progressColor: 'purple'
+        // });
+        // console.log('Wave surfer: ', this.wavesurfer);
+        // this.wavesurfer.loadBlob(blob);
+        // this.wavesurfer.on('ready', function () {
+        //   this.wavesurfer.play();
+        // });
     };
     AppComponent.prototype.visualize = function () {
         var _this = this;
         var WIDTH = this.canvas.nativeElement.width;
         var HEIGHT = this.canvas.nativeElement.height;
-        this.analyser.fftSize = 2048;
+        this.analyser.fftSize = 1024;
         var bufferLength = this.analyser.frequencyBinCount;
         var dataArray = new Uint8Array(bufferLength);
         var freqDomain = new Float32Array(bufferLength);
         this.canvasCtx.clearRect(0, 0, 500, 100);
         var drawAlt = function () {
-            console.log("data array: ", dataArray);
+            // console.log("data array: ", dataArray);
+            console.log("freq domain: ", freqDomain);
             console.log('Analyser: ', _this.analyser);
-            _this.audioBufferData.push(Object.assign({ time: _this.audioCtx.currentTime, data: dataArray }));
-            // audioBufferArray = audioBufferArray.concat([...dataArray]);
-            dataArray.forEach(function (x) {
+            // this.audioBufferData.push(Object.assign({ time: this.audioCtx.currentTime, data: dataArray }));
+            // // audioBufferArray = audioBufferArray.concat([...dataArray]);
+            // dataArray.forEach(x => {
+            //   this.audioBufferArray.push(x);
+            // });
+            _this.audioBufferData.push(Object.assign({ time: _this.audioCtx.currentTime, data: freqDomain }));
+            freqDomain.forEach(function (x) {
                 _this.audioBufferArray.push(x);
             });
             console.log('Audio Buffer data: ', _this.audioBufferData);
             console.log('Audio Buffer array: ', _this.audioBufferArray);
             // getByteFrequencyData() -> copies current frequency data into unassigned byte array passed into it
-            _this.analyser.getByteFrequencyData(dataArray);
-            _this.analyser.getByteTimeDomainData(dataArray);
+            // this.analyser.getByteFrequencyData(dataArray);
+            // this.analyser.getByteTimeDomainData(dataArray);
+            _this.analyser.getFloatFrequencyData(freqDomain);
+            _this.analyser.getFloatTimeDomainData(freqDomain);
             _this.drawVisual = requestAnimationFrame(drawAlt);
             _this.updatePitch();
+            // this.calculateRMS(freqDomain);
             console.log('Draw visual: ', _this.drawVisual);
             _this.canvasCtx.fillStyle = '#181818'; // draw wave with canvas
             _this.canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -334,19 +356,22 @@ var AppComponent = /** @class */ (function () {
         var _this = this;
         this.analyser.getFloatTimeDomainData(this.buffer);
         var ac = this.autoCorrelate(this.buffer, this.audioCtx.sampleRate);
+        console.log('AC: ', ac);
         if (ac == -1) {
+            console.log('Pitch <<<: ', ac);
             this.pitch = 0;
         }
         else {
             this.pitch = ac;
         }
+        console.log('Amplitude decibel value: ', 10 * Math.log10(ac));
+        console.log('Pitch: ', this.pitch);
         var time = 0;
         var sec = 1000;
         var interval = setInterval(function () {
             time += sec;
             if (_this.audioCtx.state == 'running') {
                 _this.lineChartData[0]['data'].push(_this.pitch.toFixed(2));
-                console.log('asdasd: ', _this.lineChartData);
             }
             else {
                 clearInterval(interval);
@@ -400,8 +425,8 @@ var AppComponent = /** @class */ (function () {
         return sampleRate / T0;
     };
     AppComponent.prototype.generateChartData = function () {
-        _amcharts_amcharts4_core__WEBPACK_IMPORTED_MODULE_3__["useTheme"](_amcharts_amcharts4_themes_animated__WEBPACK_IMPORTED_MODULE_5__["default"]);
-        this.amChart = _amcharts_amcharts4_core__WEBPACK_IMPORTED_MODULE_3__["create"]("chartdiv", _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_4__["XYChart"]);
+        _amcharts_amcharts4_core__WEBPACK_IMPORTED_MODULE_2__["useTheme"](_amcharts_amcharts4_themes_animated__WEBPACK_IMPORTED_MODULE_4__["default"]);
+        this.amChart = _amcharts_amcharts4_core__WEBPACK_IMPORTED_MODULE_2__["create"]("chartdiv", _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_3__["XYChart"]);
         this.amChart.paddingRight = 20;
         var data = [];
         if (this.hideZeroes) {
@@ -417,25 +442,25 @@ var AppComponent = /** @class */ (function () {
         }
         this.amChart.data = data;
         // Create axes
-        this.categoryAxis = this.amChart.xAxes.push(new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_4__["CategoryAxis"]());
+        this.categoryAxis = this.amChart.xAxes.push(new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_3__["CategoryAxis"]());
         this.categoryAxis.dataFields.category = "category";
         this.categoryAxis.renderer.grid.template.location = 0;
-        this.valueAxis = this.amChart.yAxes.push(new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_4__["ValueAxis"]());
+        this.valueAxis = this.amChart.yAxes.push(new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_3__["ValueAxis"]());
         // Create series
-        this.series = this.amChart.series.push(new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_4__["LineSeries"]());
+        this.series = this.amChart.series.push(new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_3__["LineSeries"]());
         this.series.dataFields.valueY = "value";
         this.series.dataFields.categoryX = "category";
         this.series.tooltipText = "{valueY}";
         this.series.strokeWidth = 3;
         this.series.xAxis = this.categoryAxis;
         this.series.tensionX = 0.77;
-        this.series.bullets.push(new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_4__["CircleBullet"]());
-        this.amChart.cursor = new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_4__["XYCursor"]();
-        this.scrollbarX = new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_4__["XYChartScrollbar"]();
+        this.series.bullets.push(new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_3__["CircleBullet"]());
+        this.amChart.cursor = new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_3__["XYCursor"]();
+        this.scrollbarX = new _amcharts_amcharts4_charts__WEBPACK_IMPORTED_MODULE_3__["XYChartScrollbar"]();
         this.scrollbarX.series.push(this.series);
         this.amChart.scrollbarX = this.scrollbarX;
-        console.log('Scroll bar: ', this.scrollbarX);
-        console.log('Series: ', this.series);
+        // console.log('Scroll bar: ', this.scrollbarX);
+        // console.log('Series: ', this.series);
         this.amChart = this.amChart;
     };
     AppComponent.prototype.togglePitchDisplay = function () {
@@ -449,7 +474,8 @@ var AppComponent = /** @class */ (function () {
             this.lineChartData[0]['data'] = this.pitchDataPoints;
         }
         this.generateChartData();
-        this.getAnnotaiton(this.lineChartData[0]['data'], Object(_syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_6__["getSeriesColor"])(theme)[1]);
+        this.getAnnotaiton(this.lineChartData[0]['data'], Object(_syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_5__["getSeriesColor"])(theme)[1]);
+        this.calculateRollingAverage();
     };
     AppComponent.prototype.toggleScroll = function () {
         console.log('Toggle scrolled:');
@@ -465,15 +491,6 @@ var AppComponent = /** @class */ (function () {
         console.log('args:ASDasd', args);
         for (var i = 0; i < args.length; i++) {
             chartAnnotation.push({
-                // content:
-                //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
-                //   "background: " +
-                //   backgroundColor +
-                //   "; border: 2px solid " +
-                //   color +
-                //   "; color:" +
-                //   color +
-                //   '">W</div>',
                 x: args[i]["x"],
                 y: args[i]["y"],
                 coordinateUnits: "Point"
@@ -481,6 +498,7 @@ var AppComponent = /** @class */ (function () {
         }
         this.rangeValue = [args[0]['x'], args[args.length - 1]['x']];
         this.dataSource = args;
+        this.generateAmplitudeChart(this.dataSource);
         console.log('Range value: ', this.rangeValue);
         console.log('data source: ', this.dataSource);
     };
@@ -494,7 +512,7 @@ var AppComponent = /** @class */ (function () {
         args.text[0] = Math.round(parseInt(args.text[0], 10)).toString();
     };
     AppComponent.prototype.load = function (args) {
-        args.rangeNavigator.rangeTooltipModule = new _syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_6__["RangeTooltip"](args.rangeNavigator);
+        args.rangeNavigator.rangeTooltipModule = new _syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_5__["RangeTooltip"](args.rangeNavigator);
     };
     AppComponent.prototype.changed = function (args) {
         this.rangeAverage = 0;
@@ -526,10 +544,10 @@ var AppComponent = /** @class */ (function () {
                 this.rangeFrom = this.rangeFrom + this.rangeSize;
             }
             console.log('Rolling average data [points]: ', this.rollingAveragePitchDataPoints);
-            this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
+            this.generateRollingAverageChart(this.rollingAveragePitchDataPoints);
         }
     };
-    AppComponent.prototype.generateRollingAveragePitchChart = function (args) {
+    AppComponent.prototype.generateRollingAverageChart = function (args) {
         console.log('Args: ', args);
         args = args.map(function (data, i) {
             return {
@@ -540,22 +558,20 @@ var AppComponent = /** @class */ (function () {
         console.log('Rolling average data points source: ', args);
         for (var i = 0; i < args.length; i++) {
             chartAnnotation.push({
-                // content:
-                //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
-                //   "background: " +
-                //   backgroundColor +
-                //   "; border: 2px solid " +
-                //   color +
-                //   "; color:" +
-                //   color +
-                //   '">W</div>',
                 x: args[i]["x"],
                 y: args[i]["y"],
                 coordinateUnits: "Point"
             });
         }
         this.rollingAverageDataSource = args;
-        console.log('fifififi: ', this.rollingAverageDataSource);
+        this.rollingAverageAmplitudeDataSource = args.map(function (data, i) {
+            return {
+                x: i + 1,
+                y: (10 * Math.log10(parseFloat(data['y']))) == -Infinity ? 0 : (10 * Math.log10(parseFloat(data['y'])))
+            };
+        });
+        console.log('Rolling average pitch data source: ', this.rollingAverageDataSource);
+        console.log('Rolling average amplitude data source: ', this.rollingAverageAmplitudeDataSource);
     };
     AppComponent.prototype.changeIncrementSize = function ($event) {
         this.incrementSizeEntered = true;
@@ -568,18 +584,6 @@ var AppComponent = /** @class */ (function () {
             this.incrementSize = 1;
         }
     };
-    // changeStartingPoint($event) {
-    //   this.incrementSizeEntered = true;
-    //   console.log('Starting point: ', $event.target.value);
-    //   if (parseInt($event.target.value) > 0) {
-    //     this.startingPoint = parseInt($event.target.value);
-    //     this.rangeValue = [this.startingPoint, this.rangeValue[1]];
-    //   } else {
-    //     this.startingPoint = 1;
-    //   }
-    //   this.rangeFrom = this.startingPoint;
-    //   // this.Chart.dataBind();
-    // }
     AppComponent.prototype.changeRangeSize = function ($event) {
         if (parseInt($event.target.value) > 0) {
             this.rangeSize = parseInt($event.target.value);
@@ -588,30 +592,51 @@ var AppComponent = /** @class */ (function () {
         else {
             this.rangeSize = 0;
         }
-        // this.rangeFrom = this.rangeFrom + this.rangeSize;
-        // this.calculateRollingAverage();
     };
     AppComponent.prototype.calculateRollingAverage = function () {
         this.rollingAveragePitchDataPoints = [];
         console.log('asdasd: ', this.dataSource);
         console.log('123123: ', Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize);
         // let z = 0;
-        for (var i = this.startingPoint; i <= Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.incrementSize) {
+        for (var i = this.startingPoint; i < Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.incrementSize) {
             var sum = 0;
             console.log('i: ', i);
             // z = i;
             // console.log('Range Average::::::::::::::::', this.rangeAverage);
             //       this.rangeAverage = Math.round((sum / args.selectedData.length + Number.EPSILON) * 100) / 100;
             // console.log('Average pitch: ', this.rangeAverage);
-            for (var j = i; j <= i + this.rangeSize; j++) {
-                sum += this.dataSource[j]['y'];
+            for (var j = i; j < i + this.rangeSize; j++) {
+                if (this.dataSource[j]) {
+                    sum += this.dataSource[j]['y'];
+                }
             }
             // this.rangeAverage = sum / this.rangeSize;
             this.rangeAverage = Math.round((sum / this.rangeSize + Number.EPSILON) * 100) / 100;
             console.log('Average pitch: ', this.rangeAverage);
             this.rollingAveragePitchDataPoints.push(this.rangeAverage);
-            this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
+            console.log('Roll: ', this.rollingAveragePitchDataPoints);
+            this.generateRollingAverageChart(this.rollingAveragePitchDataPoints);
         }
+    };
+    // for amplitude
+    AppComponent.prototype.generateAmplitudeChart = function (array) {
+        console.log('Amplitude array: ', array);
+        array = array.map(function (data, i) {
+            return {
+                x: i + 1,
+                y: (10 * Math.log10(parseFloat(data['y']))) == -Infinity ? 0 : (10 * Math.log10(parseFloat(data['y'])))
+            };
+        });
+        console.log('Amplitude args:', array);
+        this.amplitudeDataSource = array;
+    };
+    // RMS -> Root Mean Squared
+    AppComponent.prototype.calculateRMS = function (array) {
+        var rms = Math.sqrt(array
+            .map(function (val) { return (val * val); })
+            .reduce(function (acum, val) { return acum + val; })
+            / array.length);
+        console.log('RMS value: ', rms);
     };
     __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"])('myCanvas'),
@@ -619,7 +644,7 @@ var AppComponent = /** @class */ (function () {
     ], AppComponent.prototype, "canvas", void 0);
     __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"])("chartDouble"),
-        __metadata("design:type", _syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_6__["Chart"])
+        __metadata("design:type", _syncfusion_ej2_charts__WEBPACK_IMPORTED_MODULE_5__["Chart"])
     ], AppComponent.prototype, "Chart", void 0);
     AppComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -629,7 +654,7 @@ var AppComponent = /** @class */ (function () {
         }),
         __metadata("design:paramtypes", [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ElementRef"],
             _angular_core__WEBPACK_IMPORTED_MODULE_0__["Renderer2"],
-            ngx_ui_loader__WEBPACK_IMPORTED_MODULE_7__["NgxUiLoaderService"]])
+            ngx_ui_loader__WEBPACK_IMPORTED_MODULE_6__["NgxUiLoaderService"]])
     ], AppComponent);
     return AppComponent;
 }());
