@@ -127,6 +127,7 @@ export class AppComponent {
   rollingAverageAmplitudeDataPoints = [];
   rollingAverageAmplitudeRange = [];
   public primaryYAxisForAmplitude: Object = {
+    labelFormat: "{value} dB",
     title: "Amplitude",
     minimum: 0,
     maximum: 30,
@@ -503,6 +504,7 @@ export class AppComponent {
     }
     this.generateChartData();
     this.getAnnotaiton(this.lineChartData[0]['data'], getSeriesColor(theme)[1]);
+    this.calculateRollingAverage();
   }
 
   toggleScroll() {
@@ -525,6 +527,7 @@ export class AppComponent {
   public chartArea: Object = { border: { width: 0 } };
 
   public primaryYAxisForPitch: Object = {
+    labelFormat: "{value} Hz",
     title: "Pitch",
     minimum: 0,
     majorTickLines: { width: 0 },
@@ -635,8 +638,7 @@ export class AppComponent {
     args = args.map((data, i) => {
       return {
         x: i + 1,
-        y: parseFloat(data),
-        color: '#1E13EC'
+        y: parseFloat(data)
       }
     });
     console.log('Rolling average data points source: ', args)
@@ -676,9 +678,6 @@ export class AppComponent {
     } else {
       this.rangeSize = 0;
     }
-    // this.rangeFrom = this.rangeFrom + this.rangeSize;
-
-    // this.calculateRollingAverage();
   }
 
   calculateRollingAverage() {
@@ -703,6 +702,7 @@ export class AppComponent {
 
       console.log('Average pitch: ', this.rangeAverage);
       this.rollingAveragePitchDataPoints.push(this.rangeAverage);
+      console.log('Roll: ', this.rollingAveragePitchDataPoints);
       this.generateRollingAverageChart(this.rollingAveragePitchDataPoints);
     }
   }
