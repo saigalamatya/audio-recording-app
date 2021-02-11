@@ -179,10 +179,12 @@ var AppComponent = /** @class */ (function () {
         var _this = this;
         this.recordCompleted = false;
         this.startingPoint = 0;
+        this.incrementSize = 0;
         this.rangeAverage = 0;
         this.rangeSize = 0;
         this.rangeFrom = 0;
         this.incrementSizeEntered = false;
+        this.rollingAveragePitchDataPoints = [];
         if (!this.isRecording) {
             if (this.au && this.li && this.link) {
                 this.url = null;
