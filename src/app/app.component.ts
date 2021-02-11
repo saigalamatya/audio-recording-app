@@ -123,6 +123,9 @@ export class AppComponent {
   // for amplitude
   amplitudeDataSource = [];
   amplitudeRangeValue = [];
+  public amplitudeMarker: Object = {
+    visible: false
+  };
 
   constructor(
     private elementRef: ElementRef,
@@ -216,9 +219,9 @@ export class AppComponent {
     });
 
     this.pitchDataPoints = this.lineChartData[0]['data'];
+    console.log('Line chart data: ', this.lineChartData[0]['data']);
     this.generateChartData();
     this.getAnnotaiton(this.lineChartData[0]['data'].filter(x => x != 0), getSeriesColor(theme)[1]);
-    this.generateAmplitudeChart(this.audioBufferArray);
     this.displayLineGraph = true;
     this.audioCtx.close();
     cancelAnimationFrame(this.drawVisual);
@@ -289,7 +292,7 @@ export class AppComponent {
     let WIDTH = this.canvas.nativeElement.width;
     let HEIGHT = this.canvas.nativeElement.height;
 
-    this.analyser.fftSize = 2048;
+    this.analyser.fftSize = 1024;
 
     var bufferLength = this.analyser.frequencyBinCount;
     var dataArray = new Uint8Array(bufferLength);
@@ -324,6 +327,7 @@ export class AppComponent {
 
       this.drawVisual = requestAnimationFrame(drawAlt);
       this.updatePitch();
+      // this.calculateRMS(freqDomain);
 
       console.log('Draw visual: ', this.drawVisual);
 
@@ -362,21 +366,22 @@ export class AppComponent {
   updatePitch() {
     this.analyser.getFloatTimeDomainData(this.buffer);
     var ac = this.autoCorrelate(this.buffer, this.audioCtx.sampleRate);
+    console.log('AC: ', ac);
 
     if (ac == -1) {
+      console.log('Pitch <<<: ', ac)
       this.pitch = 0;
     } else {
       this.pitch = ac;
     }
-
+    console.log('Amplitude decibel value: ', 10 * Math.log10(ac));
+    console.log('Pitch: ', this.pitch);
     let time = 0;
     let sec = 1000;
     var interval = setInterval(() => {
       time += sec;
       if (this.audioCtx.state == 'running') {
         this.lineChartData[0]['data'].push(this.pitch.toFixed(2));
-
-        console.log('asdasd: ', this.lineChartData);
       } else {
         clearInterval(interval);
       }
@@ -473,8 +478,8 @@ export class AppComponent {
     this.scrollbarX.series.push(this.series);
     this.amChart.scrollbarX = this.scrollbarX;
 
-    console.log('Scroll bar: ', this.scrollbarX);
-    console.log('Series: ', this.series);
+    // console.log('Scroll bar: ', this.scrollbarX);
+    // console.log('Series: ', this.series);
 
     this.amChart = this.amChart;
   }
@@ -512,7 +517,7 @@ export class AppComponent {
   public chartArea: Object = { border: { width: 0 } };
 
   public primaryYAxis: Object = {
-    title: "Pitch",
+    title: "Pitch & Amplitude",
     minimum: 0,
     majorTickLines: { width: 0 },
     lineStyle: { width: 0 }
@@ -571,6 +576,7 @@ export class AppComponent {
     }
     this.rangeValue = [args[0]['x'], args[args.length - 1]['x']];
     this.dataSource = args;
+    this.generateAmplitudeChart(this.dataSource);
     console.log('Range value: ', this.rangeValue);
     console.log('data source: ', this.dataSource);
   }
@@ -719,28 +725,47 @@ export class AppComponent {
     array = array.map((data, i) => {
       return {
         x: i + 1,
-        y: data
+        y: 10 * Math.log10(parseFloat(data['y']))
       }
     });
-    console.log('args:ASDasd', array)
-    for (let i: number = 0; i < array.length; i++) {
-      chartAnnotation.push({
-        // content:
-        //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
-        //   "background: " +
-        //   backgroundColor +
-        //   "; border: 2px solid " +
-        //   color +
-        //   "; color:" +
-        //   color +
-        //   '">W</div>',
-        x: array[i]["x"],
-        y: array[i]["y"],
-        coordinateUnits: "Point"
-      });
-    }
-    this.amplitudeRangeValue = [array[0]['x'], array[array.length - 1]['x']];
+    // // let rms = Math.sqrt(
+    // //   array
+    // //     .map(val => (val * val))
+    // //     .reduce((acum, val) => acum + val)
+    // //   / array.length
+    // // );
+    // // console.log('RMS value: ', rms);
+    console.log('Amplitude args:', array);
+    // for (let i: number = 0; i < array.length; i++) {
+    //   chartAnnotation.push({
+    //     // content:
+    //     //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
+    //     //   "background: " +
+    //     //   backgroundColor +
+    //     //   "; border: 2px solid " +
+    //     //   color +
+    //     //   "; color:" +
+    //     //   color +
+    //     //   '">W</div>',
+    //     x: array[i]["x"],
+    //     y: array[i]["y"],
+    //     coordinateUnits: "Point"
+    //   });
+    // }
+    // this.amplitudeRangeValue = [array[0]['x'], array[array.length - 1]['x']];
     this.amplitudeDataSource = array;
+  }
+
+  // RMS -> Root Mean Squared
+  calculateRMS(array) {
+
+    let rms = Math.sqrt(
+      array
+        .map(val => (val * val))
+        .reduce((acum, val) => acum + val)
+      / array.length
+    );
+    console.log('RMS value: ', rms);
   }
 
 }

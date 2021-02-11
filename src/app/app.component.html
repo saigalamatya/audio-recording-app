@@ -80,7 +80,7 @@
       </div>
 
     </form>
-    <label>Amplitude Chart</label>
+    <!-- <label>Amplitude Chart</label>
     <br />
     <div class="row">
       <div align="center">
@@ -90,13 +90,13 @@
           (axisLabelRender)='axisLabelRender($event)'>
           <e-series-collection>
             <e-series [dataSource]='amplitudeDataSource' name='Decibel' type='Spline' xName='x' yName='y' width='2'
-              [marker]="marker" [animation]='animation'>
+              [marker]="amplitudeMarker" [animation]='animation'>
             </e-series>
           </e-series-collection>
         </ejs-chart>
       </div>
-    </div>
-    <label>Pitch Chart</label>
+    </div> -->
+    <label>Pitch & Amplitude Chart</label>
     <br />
     <div class="row" align="center">
       <!-- <div align="center">
@@ -109,7 +109,7 @@
           </e-rangenavigator-series-collection>
         </ejs-rangenavigator>
       </div> -->
-      <!-- <div align="center">
+      <div align="center">
         <ejs-chart #chartDouble style='display:block;' id='chartDouble' align='center' [chartArea]='chartArea'
           [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis' height='350' [theme]='theme'
           [tooltip]='tooltip' [annotations]='annotations' [legendSettings]='legendSettings'
@@ -118,9 +118,12 @@
             <e-series [dataSource]='dataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'
               [marker]="marker" [animation]='animation'>
             </e-series>
+            <e-series [dataSource]='amplitudeDataSource' name='Amplitude' type='Spline' xName='x' yName='y' width='2'
+              [marker]="marker" [animation]='animation'>
+            </e-series>
           </e-series-collection>
         </ejs-chart>
-      </div> -->
+      </div>
     </div>
     <!-- <label>Rolling Average Chart</label>
     <br />
