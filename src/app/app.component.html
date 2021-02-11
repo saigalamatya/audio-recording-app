@@ -125,7 +125,7 @@
         </ejs-chart>
       </div>
     </div>
-    <!-- <label>Rolling Average Chart</label>
+    <label>Rolling Average Chart</label>
     <br />
     <div class="row">
       <div align="center">
@@ -137,10 +137,13 @@
             <e-series [dataSource]='rollingAverageDataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'
               [marker]="marker" [animation]='animation'>
             </e-series>
+            <e-series [dataSource]='rollingAverageAmplitudeDataSource' name='Amplitude' type='Spline' xName='x'
+              yName='y' width='2' [marker]="marker" [animation]='animation'>
+            </e-series>
           </e-series-collection>
         </ejs-chart>
       </div>
-    </div> -->
+    </div>
   </div>
 </div>
 

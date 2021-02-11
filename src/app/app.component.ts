@@ -123,9 +123,9 @@ export class AppComponent {
   // for amplitude
   amplitudeDataSource = [];
   amplitudeRangeValue = [];
-  public amplitudeMarker: Object = {
-    visible: false
-  };
+  rollingAverageAmplitudeDataSource = [];
+  rollingAverageAmplitudeDataPoints = [];
+  rollingAverageAmplitudeRange = [];
 
   constructor(
     private elementRef: ElementRef,
@@ -627,11 +627,11 @@ export class AppComponent {
         this.rangeFrom = this.rangeFrom + this.rangeSize;
       }
       console.log('Rolling average data [points]: ', this.rollingAveragePitchDataPoints);
-      this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
+      this.generateRollingAverageChart(this.rollingAveragePitchDataPoints);
     }
   }
 
-  generateRollingAveragePitchChart(args) {
+  generateRollingAverageChart(args) {
     console.log('Args: ', args);
     args = args.map((data, i) => {
       return {
@@ -657,7 +657,14 @@ export class AppComponent {
       });
     }
     this.rollingAverageDataSource = args;
-    console.log('fifififi: ', this.rollingAverageDataSource);
+    this.rollingAverageAmplitudeDataSource = args.map((data, i) => {
+      return {
+        x: i + 1,
+        y: (10 * Math.log10(parseFloat(data['y']))) == -Infinity ? 0 : (10 * Math.log10(parseFloat(data['y'])))
+      }
+    });
+    console.log('Rolling average pitch data source: ', this.rollingAverageDataSource);
+    console.log('Rolling average amplitude data source: ', this.rollingAverageAmplitudeDataSource);
   }
 
   changeIncrementSize($event) {
@@ -701,21 +708,24 @@ export class AppComponent {
     console.log('asdasd: ', this.dataSource);
     console.log('123123: ', Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize);
     // let z = 0;
-    for (let i = this.startingPoint; i <= Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.incrementSize) {
+    for (let i = this.startingPoint; i < Math.round(this.dataSource.length * this.rangeSize) / this.rangeSize; i = i + this.incrementSize) {
       let sum = 0;
       console.log('i: ', i);
       // z = i;
       // console.log('Range Average::::::::::::::::', this.rangeAverage);
       //       this.rangeAverage = Math.round((sum / args.selectedData.length + Number.EPSILON) * 100) / 100;
       // console.log('Average pitch: ', this.rangeAverage);
-      for (let j = i; j <= i + this.rangeSize; j++) {
-        sum += this.dataSource[j]['y'];
+      for (let j = i; j < i + this.rangeSize; j++) {
+        if (this.dataSource[j]['y']) {
+          sum += this.dataSource[j]['y'];
+        }
       }
       // this.rangeAverage = sum / this.rangeSize;
       this.rangeAverage = Math.round((sum / this.rangeSize + Number.EPSILON) * 100) / 100;
+
       console.log('Average pitch: ', this.rangeAverage);
       this.rollingAveragePitchDataPoints.push(this.rangeAverage);
-      this.generateRollingAveragePitchChart(this.rollingAveragePitchDataPoints);
+      this.generateRollingAverageChart(this.rollingAveragePitchDataPoints);
     }
   }
 
@@ -725,34 +735,10 @@ export class AppComponent {
     array = array.map((data, i) => {
       return {
         x: i + 1,
-        y: 10 * Math.log10(parseFloat(data['y']))
+        y: (10 * Math.log10(parseFloat(data['y']))) == -Infinity ? 0 : (10 * Math.log10(parseFloat(data['y'])))
       }
     });
-    // // let rms = Math.sqrt(
-    // //   array
-    // //     .map(val => (val * val))
-    // //     .reduce((acum, val) => acum + val)
-    // //   / array.length
-    // // );
-    // // console.log('RMS value: ', rms);
     console.log('Amplitude args:', array);
-    // for (let i: number = 0; i < array.length; i++) {
-    //   chartAnnotation.push({
-    //     // content:
-    //     //   '<div id= "wicket" style="width: 20px; height:20px; border-radius: 5px;' +
-    //     //   "background: " +
-    //     //   backgroundColor +
-    //     //   "; border: 2px solid " +
-    //     //   color +
-    //     //   "; color:" +
-    //     //   color +
-    //     //   '">W</div>',
-    //     x: array[i]["x"],
-    //     y: array[i]["y"],
-    //     coordinateUnits: "Point"
-    //   });
-    // }
-    // this.amplitudeRangeValue = [array[0]['x'], array[array.length - 1]['x']];
     this.amplitudeDataSource = array;
   }
 
