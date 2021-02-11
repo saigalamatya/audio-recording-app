@@ -16,16 +16,14 @@
     <canvas class="visualizer ml-3" width="640" height="100" #myCanvas></canvas>
   </div>
 
-  <div class="row">
-    <!-- <canvas class="sine-wave-visualizer" width="300" height="100"></canvas> -->
+  <!-- <div class="row">
     <div id="waveform"></div>
 
     <div class="waveform-container">
       <div class="zoom-view-container"></div>
       <div class="overview-container"></div>
     </div>
-    <!-- </div> -->
-  </div>
+  </div> -->
 
   <div class="row">
     <label class="ml-3">Pitch: {{pitch.toFixed(2)}}Hz</label>
@@ -80,6 +78,21 @@
       </div>
 
     </form>
+    <label>Amplitude Chart</label>
+    <br />
+    <div class="row">
+      <div align="center">
+        <ejs-chart #amplitudeChart style='display:block;' id='amplitudeChart' align='center' [chartArea]='chartArea'
+          [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxisForAmplitude' height='300'
+          [theme]='theme' [tooltip]='tooltip' [annotations]='annotations' (axisLabelRender)='axisLabelRender($event)'>
+          <e-series-collection>
+            <e-series [dataSource]='amplitudeDataSource' name='Amplitude' type='Spline' xName='x' yName='y' width='2'
+              [marker]="marker" [animation]='animation' [fill]="'#e74c3d'">
+            </e-series>
+          </e-series-collection>
+        </ejs-chart>
+      </div>
+    </div>
     <label>Pitch Chart</label>
     <br />
     <div class="row" align="center">
@@ -95,9 +108,8 @@
       </div> -->
       <div align="center">
         <ejs-chart #chartDouble style='display:block;' id='chartDouble' align='center' [chartArea]='chartArea'
-          [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis' height='350' [theme]='theme'
-          [tooltip]='tooltip' [annotations]='annotations' [legendSettings]='legendSettings'
-          (axisLabelRender)='axisLabelRender($event)'>
+          [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxisForPitch' height='300'
+          [theme]='theme' [tooltip]='tooltip' [annotations]='annotations' (axisLabelRender)='axisLabelRender($event)'>
           <e-series-collection>
             <e-series [dataSource]='dataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'
               [marker]="marker" [animation]='animation'>
@@ -106,13 +118,29 @@
         </ejs-chart>
       </div>
     </div>
-    <label>Rolling Average Chart</label>
+    <label>Rolling Average (Amplitude)</label>
     <br />
     <div class="row">
       <div align="center">
-        <ejs-chart #rollingAverageChart style='display:block;' id='rollingAverageChart' align='center'
-          [chartArea]='chartArea' [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxis'
-          height='350' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations'
+        <ejs-chart #rollingAverageAmplitudeChart style='display:block;' id='rollingAverageAmplitudeChart' align='center'
+          [chartArea]='chartArea' [width]='width' [primaryXAxis]='primaryXAxis'
+          [primaryYAxis]='primaryYAxisForAmplitude' height='300' [theme]='theme' [tooltip]='tooltip'
+          [annotations]='annotations' (axisLabelRender)='axisLabelRender($event)'>
+          <e-series-collection>
+            <e-series [dataSource]='rollingAverageAmplitudeDataSource' name='Amplitude' type='Spline' xName='x'
+              yName='y' width='2' [marker]="marker" [animation]='animation' [fill]="'#e74c3d'">
+            </e-series>
+          </e-series-collection>
+        </ejs-chart>
+      </div>
+    </div>
+    <label>Rolling Average (Pitch)</label>
+    <br />
+    <div class="row">
+      <div align="center">
+        <ejs-chart #rollingAveragePitchChart style='display:block;' id='rollingAveragePitchChart' align='center'
+          [chartArea]='chartArea' [width]='width' [primaryXAxis]='primaryXAxis' [primaryYAxis]='primaryYAxisForPitch'
+          height='300' [theme]='theme' [tooltip]='tooltip' [annotations]='annotations'
           (axisLabelRender)='axisLabelRender($event)'>
           <e-series-collection>
             <e-series [dataSource]='rollingAverageDataSource' name='Pitch' type='Spline' xName='x' yName='y' width='2'
