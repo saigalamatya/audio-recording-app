@@ -157,7 +157,8 @@ export class AppComponent {
     this.rangeSize = 0;
     this.rangeFrom = 0;
     this.incrementSizeEntered = false;
-    this.rollingAveragePitchDataPoints = [];
+    this.rollingAverageAmplitudeDataSource = [];
+    this.rollingAverageDataSource = [];
 
     if (!this.isRecording) {
       if (this.au && this.li && this.link) {
