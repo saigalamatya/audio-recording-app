@@ -136,6 +136,9 @@ export class AppComponent {
     lineStyle: { width: 0 }
   };
 
+  // for uploading audio
+  audioSample;
+
   constructor(
     private elementRef: ElementRef,
     private _renderer: Renderer2,
@@ -335,7 +338,7 @@ export class AppComponent {
       // this.analyser.getByteFrequencyData(dataArray);
       // this.analyser.getByteTimeDomainData(dataArray);
       this.analyser.getFloatFrequencyData(freqDomain);
-      this.analyser.getFloatTimeDomainData(freqDomain);
+      // this.analyser.getFloatTimeDomainData(freqDomain);
 
       this.drawVisual = requestAnimationFrame(drawAlt);
       this.updatePitch();
@@ -733,6 +736,47 @@ export class AppComponent {
       / array.length
     );
     console.log('RMS value: ', rms);
+  }
+
+  // for audio file upload
+  fileInfo($event) {
+    console.log('File: ', $event.target.files[0]);
+    this.audioSample = $event.target.files[0];
+  }
+
+  uploadAudioSample() {
+
+    var fileReader = new FileReader();
+    this.audioCtx = new AudioContext();
+    this.source = this.audioCtx.createBufferSource();
+    let audioBufferData;
+
+    let blob: any = new Blob([this.audioSample], { type: 'audio/wav' });
+
+    // console.log('Blob: ', blob);
+
+    fileReader.onload = (e) => {
+      var arrayBuffer = fileReader.result;
+      console.log('Array Buffer: ', arrayBuffer);
+    }
+    fileReader.readAsArrayBuffer(blob);
+    // fileReader.onload = () => {
+    //   // this.audioCtx.decodeAudioData(blob.arrayBuffer()).then((buffer) => {
+
+    //   //   this.source.buffer = buffer;
+    //   //   this.source.connect(this.audioCtx.destination);
+    //   //   this.source.loop = true;
+
+    //   //   console.log('Sound source: ', this.source);
+    //   //   console.log(fileReader.result);
+    //   // });
+    // }
+    // blob.arrayBuffer().then(buffer => {
+    //   // console.log('Array Buffer: ', buffer);
+    //   // audioBufferData = new Float32Array(buffer);
+    //   // console.log('Float Data: ', audioBufferData);
+    // });
+
   }
 
 }

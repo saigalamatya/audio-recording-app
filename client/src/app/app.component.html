@@ -11,6 +11,8 @@
   <div class="btn-group mt-2 mb-2">
     <button *ngIf="!isRecording" type="button" class="btn btn-primary" (click)="startRecording()">Record</button>&nbsp;
     <button *ngIf="isRecording" type="button" class="btn btn-danger" (click)="stopRecording()">Stop</button>
+    <input type="file" class="form-control" id="customFile" (change)="fileInfo($event)" />
+    <button type="button" class="btn btn-primary" (click)="uploadAudioSample()">Upload</button>
   </div>
   <div class="row">
     <canvas class="visualizer ml-3" width="640" height="100" #myCanvas></canvas>
