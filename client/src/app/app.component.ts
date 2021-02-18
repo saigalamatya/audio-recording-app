@@ -5,8 +5,9 @@ import * as RecordRTC from 'recordrtc';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client';
 import * as recognizeMicrophone from 'watson-speech/speech-to-text/recognize-microphone';
+import { Socket } from 'ngx-socket-io';
 
 import {
   ChartTheme,
@@ -73,8 +74,6 @@ export class AppComponent {
   link;
   wavesurfer;
 
-  socket;
-
   // @ViewChild('wrapper') wrapper: ElementRef;
   @ViewChild('myCanvas') canvas: ElementRef<HTMLCanvasElement>;
   canvasCtx: CanvasRenderingContext2D;
@@ -137,10 +136,12 @@ export class AppComponent {
   constructor(
     private elementRef: ElementRef,
     private _renderer: Renderer2,
-    private _ngxUiLoaderService: NgxUiLoaderService
+    private _ngxUiLoaderService: NgxUiLoaderService,
+    private socket: Socket
   ) {
-    this.socket = io('http://localhost:3000');
-    this.socket.on('FromApi', (message) => console.log('client socket is opened', message));
+    this.socket.emit("message", 'Hello from client');
+    // this.socket = io('http://localhost:3000');
+    // this.socket.on('FromApi', (message) => console.log('client socket is opened', message));
   }
 
   ngOnInit() { }

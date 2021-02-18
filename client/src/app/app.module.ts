@@ -9,6 +9,9 @@ import { ButtonAllModule, SwitchAllModule } from '@syncfusion/ej2-angular-button
 import { ChartAllModule, RangeNavigatorAllModule } from '@syncfusion/ej2-angular-charts';
 import { FormsModule } from '@angular/forms';
 import { NgxUiLoaderModule } from 'ngx-ui-loader';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+
+const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 @NgModule({
   declarations: [
     AppComponent
@@ -22,7 +25,8 @@ import { NgxUiLoaderModule } from 'ngx-ui-loader';
     NgxUiLoaderModule,
     FormsModule,
     BrowserModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    SocketIoModule.forRoot(config)
   ],
   providers: [],
   bootstrap: [AppComponent]
