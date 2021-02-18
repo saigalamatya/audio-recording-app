@@ -5,18 +5,14 @@ import * as RecordRTC from 'recordrtc';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import { sl } from "./double_data";
-import { Browser } from "@syncfusion/ej2-base";
+import { io } from 'socket.io-client';
+import * as recognizeMicrophone from 'watson-speech/speech-to-text/recognize-microphone';
 
 import {
   ChartTheme,
-  ChartAnnotation,
-  ILoadedEventArgs,
   ChartAnnotationSettingsModel,
   getSeriesColor,
   IRangeLoadedEventArgs,
-  DateTime,
-  StepLineSeries,
   Chart,
   IChangedEventArgs,
   IRangeTooltipRenderEventArgs,
@@ -76,6 +72,8 @@ export class AppComponent {
   li;
   link;
   wavesurfer;
+
+  socket;
 
   // @ViewChild('wrapper') wrapper: ElementRef;
   @ViewChild('myCanvas') canvas: ElementRef<HTMLCanvasElement>;
@@ -141,6 +139,8 @@ export class AppComponent {
     private _renderer: Renderer2,
     private _ngxUiLoaderService: NgxUiLoaderService
   ) {
+    this.socket = io('http://localhost:3000');
+    this.socket.on('FromApi', (message) => console.log('client socket is opened', message));
   }
 
   ngOnInit() { }
